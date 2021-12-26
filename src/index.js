@@ -7,7 +7,7 @@ import MainMenu from './components/MainMenu';
 
 ReactDOM.render(
   <React.StrictMode>
-    <MainMenu />
+    <App />
   </React.StrictMode>,
   document.getElementById('root')
 );
