@@ -1,20 +1,21 @@
 import { useState } from "react"
 import Button from "./Button";
 
-const MainMenu = () => {
+const MainMenu = ({socket,setGameState}) => {
     const [userName,setUserName] = useState('')
     const [roomId,setRoomId] = useState('')
     const [showRoomId , setShowRoomId] = useState(false);
     const [userNameError, setUserNameError] = useState('');
     const [roomIdError, setRoomIdError] = useState('');
 
-
     const onClickJoin = () => {
         if(showRoomId){
             if(roomId){
                 //join the room
-                setRoomIdError('')
-                console.log(`${userName} join ${roomId}`)
+                setRoomIdError('');
+                console.log(`${userName} join ${roomId}`);
+                socket.emit('playerJoinRoom', { roomId : roomId.toString(), name : userName });
+                setGameState(1);
             }else{
                 // console.log('please enter roomId!!')
                 setRoomIdError('Please Enter a room id!')
@@ -25,13 +26,13 @@ const MainMenu = () => {
                 setUserNameError('')
             } else{
                 setUserNameError('Please Enter a Username!')
-                //console.log('please enter a username')
             }
         }
     }
 
     const onClickHost = () =>{
-        console.log(userName + 'host new room!')
+        socket.emit('hostCreateRoom', { name: userName});
+        setGameState(1);
     }
 
     const onClickBack = () => {
@@ -40,6 +41,33 @@ const MainMenu = () => {
         setUserNameError('');
         setRoomIdError('');
     }
+
+    // socket.on('socketId', (sid) => {
+    //     console.log(sid)
+    // })
+
+    // socket.on('connected', (data)=> {
+    //     console.log(data.message)
+    // })
+
+    // socket.on('roomCreated', (data)=> {
+    //     console.log(`room ${data.roomId} created`)
+    //     console.log(data)
+    // })
+
+    // socket.on('joinRoomSuccess', (data)=> {
+    //     // server emit this if find room and room exist
+    //     // location.href = `http://localhost:5000/enter-name/${data.roomId}`
+    //     console.log(data)
+    // })
+
+    // socket.on('newPlayerJoined', (data)=> {
+    //     console.log(data)
+    // })
+
+    // socket.on('roomNotExistError', (data)=> {
+    //     console.log(data.message)
+    // })
 
     return (
         <>
