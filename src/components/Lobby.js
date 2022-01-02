@@ -4,7 +4,7 @@ import RoundSlider from './RoundSlider'
 import TimeSlider from './TimeSlider'
 import Button from './Button'
 
-const Lobby = ({socket,setGameState}) => {
+const Lobby = ({socket,setGameState,data,setData}) => {
     const [round,setRound] = useState(1)
     const [time,setTime] = useState(15)
 

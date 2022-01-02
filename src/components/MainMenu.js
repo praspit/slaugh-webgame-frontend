@@ -1,7 +1,7 @@
 import { useState } from "react"
 import Button from "./Button";
 
-const MainMenu = ({socket,setGameState}) => {
+const MainMenu = ({socket,setGameState,data,setData}) => {
     const [userName,setUserName] = useState('')
     const [roomId,setRoomId] = useState('')
     const [showRoomId , setShowRoomId] = useState(false);
@@ -15,7 +15,6 @@ const MainMenu = ({socket,setGameState}) => {
                 setRoomIdError('');
                 console.log(`${userName} join ${roomId}`);
                 socket.emit('playerJoinRoom', { roomId : roomId.toString(), name : userName });
-                setGameState(1);
             }else{
                 // console.log('please enter roomId!!')
                 setRoomIdError('Please Enter a room id!')
@@ -32,6 +31,7 @@ const MainMenu = ({socket,setGameState}) => {
 
     const onClickHost = () =>{
         socket.emit('hostCreateRoom', { name: userName});
+        console.log('host create room')
         setGameState(1);
     }
 
@@ -42,32 +42,32 @@ const MainMenu = ({socket,setGameState}) => {
         setRoomIdError('');
     }
 
-    // socket.on('socketId', (sid) => {
-    //     console.log(sid)
-    // })
+    if(socket){
+        socket.on('roomCreated', (data)=> {
+            console.log(`room ${data.roomId} created`)
+            console.log(data)
+            setData(data);
+            setGameState(1);
+        })
 
-    // socket.on('connected', (data)=> {
-    //     console.log(data.message)
-    // })
+        socket.on('joinRoomSuccess', (data)=> {
+            // server emit this if find room and room exist
+            // location.href = `http://localhost:5000/enter-name/${data.roomId}`
+            console.log(data)
+            setData(data);
+            setGameState(1);
+        })
 
-    // socket.on('roomCreated', (data)=> {
-    //     console.log(`room ${data.roomId} created`)
-    //     console.log(data)
-    // })
+        socket.on('newPlayerJoined', (data)=> {
+            console.log(data)
+            setData(data);
+        })
 
-    // socket.on('joinRoomSuccess', (data)=> {
-    //     // server emit this if find room and room exist
-    //     // location.href = `http://localhost:5000/enter-name/${data.roomId}`
-    //     console.log(data)
-    // })
-
-    // socket.on('newPlayerJoined', (data)=> {
-    //     console.log(data)
-    // })
-
-    // socket.on('roomNotExistError', (data)=> {
-    //     console.log(data.message)
-    // })
+        socket.on('roomNotExistError', (data)=> {
+            console.log(data.message)
+            setData(data);
+        })
+    }
 
     return (
         <>
