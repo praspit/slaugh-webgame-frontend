@@ -29,7 +29,7 @@ const Lobby = ({data,setData}) => {
         <div className='container'>
         {inGame
             ? <h1 style={{color:"white"}}>In Game</h1>
-            : <WaitingRoom round={round} setRound={setRound} time={time} setTime={setTime} onClickStartGame={onClickStartGame}/>
+            : <WaitingRoom socket={socket} round={round} setRound={setRound} time={time} setTime={setTime} onClickStartGame={onClickStartGame} data={data} setData={setData} />
         }
         </div>
     )
