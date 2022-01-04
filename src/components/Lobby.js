@@ -1,41 +1,36 @@
 import React from 'react'
-import { useState } from 'react'
-import RoundSlider from './RoundSlider'
-import TimeSlider from './TimeSlider'
-import Button from './Button'
+import { useState, useEffect} from 'react'
+import WaitingRoom from './WaitingRoom'
+import io from 'socket.io-client'
 
-const Lobby = ({socket,setGameState,data,setData}) => {
-    const [round,setRound] = useState(1)
-    const [time,setTime] = useState(15)
+const Lobby = ({data,setData}) => {
+    const [socket,setSocket] = useState(null);
+    const [inGame,setInGame] = useState(false);
+    const [round,setRound] = useState(1);
+    const [time,setTime] = useState(15);
 
-    const onRoundChange = (event)=>{
-        setRound(event.target.valueAsNumber);
-    }
+    useEffect(() => {
+        const newSocket = io('http://localhost:5000/', { transports : ['websocket'] });
+        setSocket(newSocket);
+        console.log('new socket')
 
-    const onTimeChange = (event)=>{
-        setTime(event.target.valueAsNumber);
-    }
+        return () => {
+        newSocket.close();
+        console.log('close socket');
+        }
+    }, [setSocket])
 
     const onClickStartGame = ()=>{
         console.log(`start game for ${round} rounds and time per turn is ${time} seconds`)
+        setInGame(true);
     }
     
     return (
-        <div className='lobby'>
-            <div className='list-player'>
-                <h2>Room : 3114</h2>
-                <ul>
-                    <li>Sam</li>
-                    <li>Brad</li>
-                    <li>Susy</li>
-                    <li>Aligo</li>
-                </ul>
-            </div>
-            <div className='game-option'>
-                <RoundSlider value={round} onTypeChange={onRoundChange}></RoundSlider>
-                <TimeSlider value={time} onTypeChange={onTimeChange}></TimeSlider>
-                <Button type='start' text='Start the game' onClick={onClickStartGame}></Button>
-            </div>
+        <div className='container'>
+        {inGame
+            ? <h1 style={{color:"white"}}>In Game</h1>
+            : <WaitingRoom round={round} setRound={setRound} time={time} setTime={setTime} onClickStartGame={onClickStartGame}/>
+        }
         </div>
     )
 }
