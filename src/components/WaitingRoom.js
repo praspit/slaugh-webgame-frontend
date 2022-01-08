@@ -22,11 +22,18 @@ const WaitingRoom = ({round,setRound,time,setTime,onClickStartGame,data}) => {
                     })}
                 </ul>
             </div>
-            <div className='game-option'>
-                <RoundSlider value={round} onTypeChange={onRoundChange}></RoundSlider>
-                <TimeSlider value={time} onTypeChange={onTimeChange}></TimeSlider>
-                <Button type='start' text='Start the game' onClick={onClickStartGame}></Button>
-            </div>
+            {data.player.isHost 
+                ?
+                    <div className='game-option'>
+                    <RoundSlider value={round} onTypeChange={onRoundChange}></RoundSlider>
+                    <TimeSlider value={time} onTypeChange={onTimeChange}></TimeSlider>
+                    <Button type='start' text='Start the game' onClick={onClickStartGame}></Button>
+                    </div>
+                :
+                    <div className='game-option'>
+                        <h2>Waiting for host to start the game...</h2>
+                    </div>
+            }
         </div>
     )
 }

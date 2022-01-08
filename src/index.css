@@ -118,13 +118,27 @@ body {
   display: inline-table;
   background: rgb(48, 46, 46);
   color: #fff;
-  padding: 20px 20px 60px;
+  padding: 20px 20px 25px;
+  height: 280px;
   width: 60%;
   margin: 0px;
+}
+.list-player h2 {
+  padding-left: 5px;
+  padding-bottom: 10px;
+}
+.list-player ul {
+  list-style: none;
 }
 
 .list-player ul li {
   padding: 10px 10px;
+  width: 100%;
+  background: #262626;
+}
+
+.list-player ul li:nth-child(2n) {
+  background: #1b1b1b;
 }
 
 .game-option {

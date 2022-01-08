@@ -43,22 +43,31 @@ const Lobby = ({data,setData}) => {
             setData({...data, game:
                 {...data.game, players: players}});
         })  
+
+        socket.on('gameStart', ({message,game,roomId})=>{
+            console.log(message)
+            setData({...data, game : game});
+            setInGame(true);
+        })
+
+        return ()=>{
+            socket.off('ready');
+            socket.off('connectedToRoom');
+            socket.off('newPlayerJoined');
+            socket.off('gameStart');
+        }
+
     },[socket,data,setData])
 
     const onClickStartGame = ()=>{
-        console.log(socket);
+        // console.log(socket);
+        // console.log(data);
         if(!socket) return;
 
-
-        // socket.emit('hostStartGame',{
-        //     roomId : data.game.roomId,
-        //     player : data.player
-        // })
-
-        // socket.on('gameStart', ({message,game,roomId})=>{
-        //     console.log(message)
-        //     setData({...data, game : game});
-        // })
+        socket.emit('hostStartGame',{
+            roomId : data.game.roomId,
+            player : data.player
+        })
 
         console.log(`start game for ${round} rounds and time per turn is ${time} seconds`)
         
