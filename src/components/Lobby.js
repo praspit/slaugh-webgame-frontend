@@ -10,18 +10,58 @@ const Lobby = ({data,setData}) => {
     const [time,setTime] = useState(15);
 
     useEffect(() => {
+        //initialize socket
         const newSocket = io('http://localhost:5000/', { transports : ['websocket'] });
         setSocket(newSocket);
-        console.log('new socket')
 
         return () => {
-        newSocket.close();
-        console.log('close socket');
+            //close socket
+            newSocket.close();
+            console.log('close socket');
         }
     }, [setSocket])
 
+    useEffect(()=>{
+        if(!socket)return;
+
+        socket.on('ready', ({message, mySocketId})=>{
+            console.log({message,mySocketId});
+            socket.emit('connectRoom', {
+                roomId : data.game.roomId,
+                player : data.player
+            });
+            console.log(`${data.player.name} join room ${data.game.roomId}`)
+        })
+
+        socket.on('connectedToRoom', ({message, roomId, game})=>{
+            console.log({message,roomId,game});
+            setData({...data, game : game});
+        })
+
+        socket.on('newPlayerJoined',({message,name,roomId,players})=>{
+            console.log({message,name,roomId,players});
+            setData({...data, game:
+                {...data.game, players: players}});
+        })  
+    },[socket,data,setData])
+
     const onClickStartGame = ()=>{
+        console.log(socket);
+        if(!socket) return;
+
+
+        // socket.emit('hostStartGame',{
+        //     roomId : data.game.roomId,
+        //     player : data.player
+        // })
+
+        // socket.on('gameStart', ({message,game,roomId})=>{
+        //     console.log(message)
+        //     setData({...data, game : game});
+        // })
+
         console.log(`start game for ${round} rounds and time per turn is ${time} seconds`)
+        
         setInGame(true);
     }
     
@@ -29,7 +69,7 @@ const Lobby = ({data,setData}) => {
         <div className='container'>
         {inGame
             ? <h1 style={{color:"white"}}>In Game</h1>
-            : <WaitingRoom socket={socket} round={round} setRound={setRound} time={time} setTime={setTime} onClickStartGame={onClickStartGame} data={data} setData={setData} />
+            : <WaitingRoom  round={round} setRound={setRound} time={time} setTime={setTime} onClickStartGame={onClickStartGame} data={data} />
         }
         </div>
     )
