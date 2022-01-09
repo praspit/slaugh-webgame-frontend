@@ -21,11 +21,14 @@ const Lobby = ({data,setData}) => {
         }
     }, [setSocket])
 
+    //use socket to recieve event from server
     useEffect(()=>{
         if(!socket)return;
 
+        //catch 'ready' event from server
         socket.on('ready', ({message, mySocketId})=>{
             console.log({message,mySocketId});
+            //send roomId and player info to server
             socket.emit('connectRoom', {
                 roomId : data.game.roomId,
                 player : data.player
@@ -33,17 +36,20 @@ const Lobby = ({data,setData}) => {
             console.log(`${data.player.name} join room ${data.game.roomId}`)
         })
 
+        //get game info from server
         socket.on('connectedToRoom', ({message, roomId, game})=>{
             console.log({message,roomId,game});
             setData({...data, game : game});
         })
 
+        //get all players from server when new player join
         socket.on('newPlayerJoined',({message,name,roomId,players})=>{
             console.log({message,name,roomId,players});
             setData({...data, game:
                 {...data.game, players: players}});
         })  
 
+        //start the game 
         socket.on('gameStart', ({message,game,roomId})=>{
             console.log(message)
             setData({...data, game : game});
@@ -60,8 +66,6 @@ const Lobby = ({data,setData}) => {
     },[socket,data,setData])
 
     const onClickStartGame = ()=>{
-        // console.log(socket);
-        // console.log(data);
         if(!socket) return;
 
         socket.emit('hostStartGame',{

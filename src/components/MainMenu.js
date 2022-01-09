@@ -12,12 +12,19 @@ const MainMenu = ({socket,data,setData}) => {
 
     let navigate = useNavigate();
 
+    function isNum(val){
+        return /^\d+$/.test(val)
+    }
+
+    //player join the room
     const onClickJoin = async () => {
         if(showRoomId){
-            if(roomId){
+            if(roomId && isNum(roomId) && roomId.length===5){
                 //join the room
                 setRoomIdError('');
                 console.log(`${userName} join ${roomId}`);
+                //get room info from server
+                //and go to lobby
                 try{
                     const res = await axios.post("http://localhost:5000/api/rooms/join/" + roomId, {name:userName});
                     setRoomIdError('');
@@ -25,25 +32,28 @@ const MainMenu = ({socket,data,setData}) => {
                     navigate("../Lobby/"+ roomId);
                     console.log(res);
                 } catch(err){
+                    //the room doesn't exist
                     console.log(err);
                     console.log("Room doesn't exist!!");
-                    setRoomIdError('Invalid room id!');
+                    setRoomIdError("Room doesn't exist!");
                 }
             }else{
-                setRoomIdError('Please Enter a room id!');
+                //no room id
+                setRoomIdError('Please Enter a valid room id!');
             }
         } else{
             if(userName){
+                //show room id input
                 setShowRoomId(true)
                 setUserNameError('')
             } else{
+                //no username
                 setUserNameError('Please Enter a Username!')
             }
         }
     }
-
+    //host create room
     const onClickHost = async () =>{
-        //socket.emit('hostCreateRoom', { name: userName});
         console.log('host create room')
         try {
             const res = await axios.post("http://localhost:5000/api/rooms/hostnew", {name:userName});
