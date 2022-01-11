@@ -2,6 +2,7 @@ import React from 'react'
 import { useState, useEffect} from 'react'
 import WaitingRoom from './WaitingRoom'
 import io from 'socket.io-client'
+import InGame from './InGame'
 
 const Lobby = ({data,setData}) => {
     const [socket,setSocket] = useState(null);
@@ -81,7 +82,7 @@ const Lobby = ({data,setData}) => {
     return (
         <div className='container'>
         {inGame
-            ? <h1 style={{color:"white"}}>In Game</h1>
+            ? <InGame socket={socket}/>
             : <WaitingRoom  round={round} setRound={setRound} time={time} setTime={setTime} onClickStartGame={onClickStartGame} data={data} />
         }
         </div>
