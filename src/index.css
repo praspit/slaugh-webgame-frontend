@@ -90,6 +90,24 @@ body {
   width: 200%;
 }
 
+.btn-play-card {
+  position: absolute;
+  right: 10vw;
+  width: 100px;
+  height: 100px;
+  border-radius: 100%;
+  bottom: 30vh;
+}
+
+.btn-pass {
+  position: absolute;
+  right: 10vw;
+  width: 100px;
+  height: 100px;
+  border-radius: 100%;
+  bottom: 10vh;
+}
+
 .btn:active {
   transform: scale(0.98);
 }
@@ -202,4 +220,19 @@ body {
   margin: 10px;
   padding: 10px;
   cursor: pointer;
+}
+
+.card-photo {
+  height: 200px;
+  width: 140px;
+}
+
+@media screen and (max-width: 600px) {
+  .btn-play-card {
+    right: 0px;
+  }
+
+  .btn-pass {
+    right: 0px;
+  }
 }

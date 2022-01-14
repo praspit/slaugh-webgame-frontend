@@ -82,7 +82,7 @@ const Lobby = ({data,setData}) => {
     return (
         <div className='container'>
         {inGame
-            ? <InGame socket={socket}/>
+            ? <InGame socket={socket} data={data}/>
             : <WaitingRoom  round={round} setRound={setRound} time={time} setTime={setTime} onClickStartGame={onClickStartGame} data={data} />
         }
         </div>
