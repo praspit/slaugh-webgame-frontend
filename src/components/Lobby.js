@@ -52,8 +52,12 @@ const Lobby = ({data,setData}) => {
 
         //start the game 
         socket.on('gameStart', ({message,game,roomId})=>{
-            console.log(message)
-            setData({...data, game : game});
+            console.log(message);
+            console.log(data);
+            console.log(game);
+            const player = game.players.find((player) => player.id === data.player.id);
+            
+            setData({...data,  player: player, game : game});
             setInGame(true);
         })
 

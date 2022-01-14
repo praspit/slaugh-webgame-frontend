@@ -6,28 +6,15 @@ import { multiDragAwareReorder, multiSelectTo as multiSelect } from '../util';
 import Button from "./Button";
 import OtherPlayersUI from "./OtherPlayersUI";
 
-const cards = ['3C', '3D', '3H', '3S', '4C'].map((val)=>{
-    return (
-        {id: `${val}`,
-        content: `${val}`});
-});
-
-const cardMap = cards.reduce((previous,current)=>{
-    previous[current.id] = current
-    return previous
-},
-{}
-)
-
 const hand = {
     id:'hand',
     title: 'Card In Hand',
-    cardIds: cards.map(card => card.id)
+    cardIds: []
 }
 
 const deck = {
     id:'deck',
-    title: 'Card In Deck',
+    title: 'Place the card here',
     cardIds: []
 }
 
@@ -37,7 +24,7 @@ const initial = {
         [deck.id]: deck,
         [hand.id]: hand
     },
-    cards: cardMap
+    cards: []
 }
 
 const getCards = (entities, columnId) =>
@@ -61,7 +48,7 @@ const Container = styled.div`
 `;
 
 
-const InGame = ({socket}) => {
+const InGame = ({socket, data}) => {
     const [entities, setEntities] = useState(initial);
     const [selectedCardIds, setSelectedCardIds] = useState([]);
     const [draggingCardId, setDraggingCardId] = useState(null);
@@ -78,7 +65,7 @@ const InGame = ({socket}) => {
         }
     }, [socket])
 
-    useEffect(()=>{
+    useEffect(() => {
         window.addEventListener('click', onWindowClick);
         window.addEventListener('keydown', onWindowKeyDown);
         window.addEventListener('touchend', onWindowTouchEnd);
@@ -88,6 +75,43 @@ const InGame = ({socket}) => {
             window.removeEventListener('touchend', onWindowTouchEnd);
         })
     })
+
+    useEffect(() => {
+        const cards = data.player.hand.map((val)=>{
+            return (
+                {id: `${val}`,
+                content: `${val}`});
+        });
+
+        const cardMap = cards.reduce((previous,current)=>{
+            previous[current.id] = current
+            return previous
+        },
+        {})
+
+        const hand = {
+            id:'hand',
+            title: 'Card In Hand',
+            cardIds: cards.map(card => card.id)
+        }
+
+        const deck = {
+            id:'deck',
+            title: 'Place the card here',
+            cardIds: []
+        }
+
+        const entities = {
+            columnOrder: [deck.id, hand.id],
+            columns: {
+                [deck.id]: deck,
+                [hand.id]: hand
+            },
+            cards: cardMap
+        }
+
+        setEntities(entities);
+    },[data])
 
     const onDragStart = (start) =>{
         const id = start.draggableId;
@@ -205,6 +229,15 @@ const InGame = ({socket}) => {
     }
 
     const onClickPlayCard = () => {
+        if(!data.player.isTurn)return;
+        
+        //emit player play card
+        socket.emit('playerPlayCards',{
+            roomId: data.game.roomId,
+            player: data.player,
+            cards: entities.columns['deck'].cardIds,
+        });
+        
         console.log(entities.columns['deck'].cardIds);
     }
 
@@ -212,7 +245,7 @@ const InGame = ({socket}) => {
         setEntities({...entities, 
             columns: 
             {"deck": {...entities.columns["deck"], cardIds: []}, 
-            "hand": {...entities.columns["hand"], cardIds: [...entities.columns["deck"].cardIds, ...entities.columns["hand"].cardIds]}}
+            "hand": {...entities.columns["hand"], cardIds: [...entities.columns["hand"].cardIds, ...entities.columns["deck"].cardIds]}}
         })
         console.log("pass turn");
     }
@@ -238,8 +271,14 @@ const InGame = ({socket}) => {
                 ))}
             </Container>
         </DragDropContext>
-        <Button type="play-card" text="Play" onClick={onClickPlayCard}/>
-        <Button type="pass" text="Pass" onClick={onClickPassTurn}/>
+        {
+            data.player.isTurn && 
+            <Button type="play-card" text="Play" onClick={onClickPlayCard}/>
+        }
+        {
+            data.player.isTurn &&
+            <Button type="pass" text="Pass" onClick={onClickPassTurn}/>
+        }
         </>
     )
 }
