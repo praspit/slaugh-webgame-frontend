@@ -25,7 +25,7 @@ const CardList = styled.div`
   display: flex;
   transition: background-color 0.2s ease;
   overflow: "scroll";
-  height: ${cardHeight}px + 30px;
+  height: calc(${cardHeight}px + 30px);
   ${'' /* ${props =>
     props.isDraggingOver ? `background-color: ${colors.grey.darker}` : ''}; */}
 `
