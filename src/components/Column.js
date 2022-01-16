@@ -77,7 +77,7 @@ const Column = ({column, cards, selectedCardIds, draggingCardId, toggleSelection
             </CardList>
           )}
         </Droppable>
-      </Container>
+        </Container>
     )
 }
 

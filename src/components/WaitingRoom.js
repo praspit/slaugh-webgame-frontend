@@ -1,9 +1,9 @@
+import { useEffect } from 'react'
 import RoundSlider from './RoundSlider'
 import TimeSlider from './TimeSlider'
 import Button from './Button'
 
-const WaitingRoom = ({round,setRound,time,setTime,onClickStartGame,data}) => {
-
+const WaitingRoom = ({round,setRound,time,setTime,onClickStartGame,data,setData}) => {
     const onRoundChange = (event)=>{
         setRound(event.target.valueAsNumber);
     }

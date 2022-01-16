@@ -6,7 +6,7 @@ import InGame from './InGame'
 
 const Lobby = ({data,setData}) => {
     const [socket,setSocket] = useState(null);
-    const [inGame,setInGame] = useState(false);
+    const [inGame,setInGame] = useState(sessionStorage.getItem('inGame')=='true' || false);
     const [round,setRound] = useState(1);
     const [time,setTime] = useState(15);
 
@@ -40,24 +40,31 @@ const Lobby = ({data,setData}) => {
         //get game info from server
         socket.on('connectedToRoom', ({message, roomId, game})=>{
             console.log({message,roomId,game});
+
             setData({...data, game : game});
+            sessionStorage.setItem('data', JSON.stringify({...data, game: game}));
         })
 
         //get all players from server when new player join
         socket.on('newPlayerJoined',({message,name,roomId,players})=>{
             console.log({message,name,roomId,players});
+
             setData({...data, game:
                 {...data.game, players: players}});
+                
+            sessionStorage.setItem('data', JSON.stringify({...data, game:
+                {...data.game, players: players}}));
         })  
 
         //start the game 
         socket.on('gameStart', ({message,game,roomId})=>{
             console.log(message);
-            console.log(data);
-            console.log(game);
+
             const player = game.players.find((player) => player.id === data.player.id);
             
             setData({...data,  player: player, game : game});
+            sessionStorage.setItem('data', JSON.stringify({...data,  player: player, game : game}));
+            sessionStorage.setItem('inGame', 'true');
             setInGame(true);
         })
 
@@ -87,7 +94,7 @@ const Lobby = ({data,setData}) => {
         <div className='container'>
         {inGame
             ? <InGame socket={socket} data={data}/>
-            : <WaitingRoom  round={round} setRound={setRound} time={time} setTime={setTime} onClickStartGame={onClickStartGame} data={data} />
+            : <WaitingRoom  round={round} setRound={setRound} time={time} setTime={setTime} onClickStartGame={onClickStartGame} data={data} setData={setData}/>
         }
         </div>
     )

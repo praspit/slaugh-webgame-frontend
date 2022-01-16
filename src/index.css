@@ -227,6 +227,13 @@ body {
   width: 140px;
 }
 
+.other-player-in-game {
+  position: absolute;
+  right: 10px;
+  padding: 10px;
+  top: 10px;
+}
+
 @media screen and (max-width: 600px) {
   .btn-play-card {
     right: 0px;

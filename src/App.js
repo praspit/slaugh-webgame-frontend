@@ -8,7 +8,7 @@ import {
 } from "react-router-dom";
 
 function App() {
-  const [data,setData] = useState(null);
+  const [data,setData] = useState(JSON.parse(sessionStorage.getItem('data')) || null);
 
   return (
     <Router>

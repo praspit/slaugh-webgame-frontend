@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react"
 import styled from "styled-components";
-import Column from "./Column";
 import {DragDropContext} from 'react-beautiful-dnd'
 import { multiDragAwareReorder, multiSelectTo as multiSelect } from '../util';
+
+import Column from "./Column";
 import Button from "./Button";
 import OtherPlayersUI from "./OtherPlayersUI";
 
@@ -61,7 +62,9 @@ const InGame = ({socket, data}) => {
             });
         }
         return ()=>{
-            socket.off('nextTurnStart');
+            if(socket){
+                socket.off('nextTurnStart');
+            }
         }
     }, [socket])
 
@@ -237,7 +240,7 @@ const InGame = ({socket, data}) => {
             player: data.player,
             cards: entities.columns['deck'].cardIds,
         });
-        
+
         console.log(entities.columns['deck'].cardIds);
     }
 
@@ -252,7 +255,7 @@ const InGame = ({socket, data}) => {
 
     return (
         <>
-        <OtherPlayersUI/>
+        {/* <OtherPlayersUI data={data}/> */}
         <DragDropContext
         onDragStart={onDragStart}
         onDragEnd={onDragEnd}>

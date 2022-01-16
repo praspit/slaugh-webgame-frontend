@@ -29,6 +29,7 @@ const MainMenu = ({socket,data,setData}) => {
                     const res = await axios.post("http://localhost:5000/api/rooms/join/" + roomId, {name:userName});
                     setRoomIdError('');
                     setData(res.data);
+                    localStorage.setItem('data', JSON.stringify(res.data));
                     navigate("../Lobby/"+ roomId);
                     console.log(res);
                 } catch(err){
@@ -59,6 +60,7 @@ const MainMenu = ({socket,data,setData}) => {
             const res = await axios.post("http://localhost:5000/api/rooms/hostnew", {name:userName});
             console.log(res);
             setData(res.data);
+            localStorage.setItem('data', JSON.stringify(res.data));
             navigate("../Lobby/"+ res.data.game.roomId);
         }catch (err){
             console.log(err);
