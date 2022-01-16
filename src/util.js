@@ -251,3 +251,67 @@ export const multiSelectTo = (
 
   return combined
 }
+
+const MODES = ["start", "single", "pair", "triple", "fourth"]
+const CARD_VALUE = {'3C': 0, '3D': 1, '3H': 2, '3S': 3, '4C': 4, '4D': 5, '4H': 6, '4S': 7, '5C': 8, '5D': 9, '5H': 10, '5S': 11, '6C': 12, '6D': 13, '6H': 14, '6S': 15, '7C': 16, '7D': 17, '7H': 18, '7S': 19, '8C': 20, '8D': 21, '8H': 22, '8S': 23, '9C': 24, '9D': 25, '9H': 26, '9S': 27, '10C': 28, '10D': 29, '10H': 30, '10S': 31, 'JC': 32, 'JD': 33, 'JH': 34, 'JS': 35, 'QC': 36, 'QD': 37, 'QH': 38, 'QS': 39, 'KC': 40, 'KD': 41, 'KH': 42, 'KS': 43, 'AC': 44, 'AD': 45, 'AH': 46, 'AS': 47, '2C': 48, '2D': 49, '2H': 50, '2S': 51}
+
+function cardCompare(c1, c2){
+    return CARD_VALUE[c1] - CARD_VALUE[c2]
+}
+
+export function isLegalMove(cards, table) {
+    let mode = MODES[cards.length]
+    // sort the cards in descending order (define the value of a group of cards bu the max value card)
+    cards.sort(cardCompare).reverse()
+    // Checks if played cards have all the same faces
+    for(let i=0 ; i<cards.length ; i++){
+        if(cards[i][0] != cards[0][0]){
+            return false
+        }
+    }
+    // Cannot play 0 cards, system should make player pass
+    if(mode == 'start'){
+        return false
+    }
+    // Can play anything on the starting turn, as long as the cards have all the same faces
+    if(table.mode == 'start'){
+        return true
+    }
+    // Check if the cards values are valid to play
+    switch(mode){
+        case 'single' :
+
+            if(table.mode == 'single'){
+                return CARD_VALUE[cards[0]] > CARD_VALUE[table.top[0]]
+            }else return false
+
+        case 'pair' :
+
+            if(table.mode == 'pair'){
+                return CARD_VALUE[cards[0]] > CARD_VALUE[table.top[0]]
+            }else return false
+
+        case 'triple' :
+
+            if(table.mode == 'single'){
+                return true
+            }else if(table.mode == 'triple'){
+                return CARD_VALUE[cards[0]] > CARD_VALUE[table.top[0]]
+            }else return false
+
+        case 'fourth' :
+
+            if(table.mode == 'pair'){
+                return true
+            }else if(table.mode == 'fourth'){
+                return CARD_VALUE[cards[0]] > CARD_VALUE[table.top[0]]
+            }else return false
+
+        default :
+            console.log('default clause')
+            return false
+            
+    }
+    
+    
+}

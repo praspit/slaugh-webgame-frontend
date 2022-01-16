@@ -3,9 +3,11 @@ import styled from "styled-components";
 import {DragDropContext} from 'react-beautiful-dnd'
 import { multiDragAwareReorder, multiSelectTo as multiSelect } from '../util';
 
+import { isLegalMove } from "../util";
 import Column from "./Column";
 import Button from "./Button";
 import OtherPlayersUI from "./OtherPlayersUI";
+import LastPlayedCards from "./LastPlayedCards";
 
 const hand = {
     id:'hand',
@@ -49,21 +51,73 @@ const Container = styled.div`
 `;
 
 
-const InGame = ({socket, data}) => {
+const InGame = ({socket, data, setData}) => {
     const [entities, setEntities] = useState(initial);
+    const [lastPlayedCards,setLastPlayedCards] = useState(null);
     const [selectedCardIds, setSelectedCardIds] = useState([]);
     const [draggingCardId, setDraggingCardId] = useState(null);
 
     useEffect(() => {
         if(socket){
             console.log('have socket in game');
-            socket.on('nextTurnStart',({message})=>{
-                console.log(message);
+            socket.on('nextTurnStart',({message, game, roomId, lastPlayedCards, lastTurnPlayer}) => {
+                console.log('next turn start');
+                console.log(message,game,roomId,lastPlayedCards,lastTurnPlayer);
+
+                const player = game.players.find((player) => player.id === data.player.id);
+
+                const newData = {
+                    ...data,
+                    message,
+                    game,
+                    roomId,
+                    player,
+                }
+                setData(newData);
+                setLastPlayedCards(lastPlayedCards);
+                
+                sessionStorage.setItem('data', JSON.stringify(newData));
+                sessionStorage.setItem('lastPlayedCards', JSON.stringify(lastPlayedCards));
             });
+
+            socket.on('roundEnd', ({message, game, roomId}) => {
+                console.log('game end');
+
+                const player = game.players.find((player) => player.id === data.player.id);
+
+                const newData = {
+                    ...data,
+                    message,
+                    game,
+                    roomId,
+                    player,
+                }
+                setData(newData);
+                sessionStorage.setItem('data', JSON.stringify(newData));
+            });
+
+            socket.on('nextRoundStart',({message, game, roomId}) => {
+                console.log({message, game, roomId});
+                
+                const player = game.players.find((player) => player.id === data.player.id);
+
+                const newData = {
+                    ...data,
+                    message,
+                    game,
+                    roomId,
+                    player,
+                }
+                setData(newData);
+                sessionStorage.setItem('data', JSON.stringify(newData));
+            })
         }
         return ()=>{
             if(socket){
+                console.log('socket off');
                 socket.off('nextTurnStart');
+                socket.off('roundEnd');
+                socket.off('nextRoundStart');
             }
         }
     }, [socket])
@@ -233,7 +287,11 @@ const InGame = ({socket, data}) => {
 
     const onClickPlayCard = () => {
         if(!data.player.isTurn)return;
-        
+
+        if(!isLegalMove(entities.columns['deck'].cardIds, data.game.table)){
+            alert("The move is illegal!");
+            return;
+        }
         //emit player play card
         socket.emit('playerPlayCards',{
             roomId: data.game.roomId,
@@ -245,6 +303,14 @@ const InGame = ({socket, data}) => {
     }
 
     const onClickPassTurn = () => {
+        if(!data.player.isTurn)return;
+
+        socket.emit('playerPlayCards',{
+            roomId: data.game.roomId,
+            player: data.player,
+            cards: [],
+        });        
+
         setEntities({...entities, 
             columns: 
             {"deck": {...entities.columns["deck"], cardIds: []}, 
@@ -256,6 +322,7 @@ const InGame = ({socket, data}) => {
     return (
         <>
         {/* <OtherPlayersUI data={data}/> */}
+        <LastPlayedCards lastPlayedCards={lastPlayedCards}/>
         <DragDropContext
         onDragStart={onDragStart}
         onDragEnd={onDragEnd}>
