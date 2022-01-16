@@ -53,7 +53,6 @@ const Container = styled.div`
 
 const InGame = ({socket, data, setData}) => {
     const [entities, setEntities] = useState(initial);
-    const [lastPlayedCards,setLastPlayedCards] = useState(null);
     const [selectedCardIds, setSelectedCardIds] = useState([]);
     const [draggingCardId, setDraggingCardId] = useState(null);
 
@@ -74,10 +73,8 @@ const InGame = ({socket, data, setData}) => {
                     player,
                 }
                 setData(newData);
-                setLastPlayedCards(lastPlayedCards);
                 
                 sessionStorage.setItem('data', JSON.stringify(newData));
-                sessionStorage.setItem('lastPlayedCards', JSON.stringify(lastPlayedCards));
             });
 
             socket.on('roundEnd', ({message, game, roomId}) => {
@@ -322,7 +319,7 @@ const InGame = ({socket, data, setData}) => {
     return (
         <>
         {/* <OtherPlayersUI data={data}/> */}
-        <LastPlayedCards lastPlayedCards={lastPlayedCards}/>
+        <LastPlayedCards data={data}/>
         <DragDropContext
         onDragStart={onDragStart}
         onDragEnd={onDragEnd}>
