@@ -2,6 +2,9 @@ import { useState } from "react"
 import { useNavigate } from "react-router-dom";
 import Button from "./Button";
 import axios from "axios";
+import config from "../config/config.js";
+
+const root_URL = config.node_env === "development" ? 'http://localhost:5000' : '' 
 
 const MainMenu = ({socket,data,setData}) => {
     const [userName,setUserName] = useState('')
@@ -26,7 +29,7 @@ const MainMenu = ({socket,data,setData}) => {
                 //get room info from server
                 //and go to lobby
                 try{
-                    const res = await axios.post("http://localhost:5000/api/rooms/join/" + roomId, {name:userName});
+                    const res = await axios.post(root_URL + "/api/rooms/join/" + roomId, {name:userName});
                     setRoomIdError('');
                     setData(res.data);
                     localStorage.setItem('data', JSON.stringify(res.data));
@@ -57,7 +60,7 @@ const MainMenu = ({socket,data,setData}) => {
     const onClickHost = async () =>{
         console.log('host create room')
         try {
-            const res = await axios.post("http://localhost:5000/api/rooms/hostnew", {name:userName});
+            const res = await axios.post(root_URL + "/api/rooms/hostnew", {name:userName});
             console.log(res);
             setData(res.data);
             localStorage.setItem('data', JSON.stringify(res.data));
