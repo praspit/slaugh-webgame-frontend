@@ -3,6 +3,9 @@ import { useState, useEffect} from 'react'
 import WaitingRoom from './WaitingRoom'
 import io from 'socket.io-client'
 import InGame from './InGame'
+import config from '../config/config.js'
+
+const root_URL = config.node_env === "development" ? 'http://localhost:5000' : ''
 
 const Lobby = ({data,setData}) => {
     const [socket,setSocket] = useState(null);
@@ -12,7 +15,7 @@ const Lobby = ({data,setData}) => {
 
     useEffect(() => {
         //initialize socket
-        const newSocket = io('http://localhost:5000/', { transports : ['websocket'] });
+        const newSocket = io(root_URL + '/', { transports : ['websocket'] });
         setSocket(newSocket);
 
         return () => {
