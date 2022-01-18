@@ -62,8 +62,22 @@ const InGame = ({socket, data, setData}) => {
             socket.on('nextTurnStart',({message, game, roomId, lastPlayedCards, lastTurnPlayer}) => {
                 console.log('next turn start');
                 console.log(message,game,roomId,lastPlayedCards,lastTurnPlayer);
+                console.log(entities);
 
-                const player = game.players.find((player) => player.id === data.player.id);
+                let player = game.players.find((player) => player.id === data.player.id);
+
+                if (player.id === lastTurnPlayer.id) {
+                    const hand = entities.columns['hand'].cardIds.filter((handCardId) => {
+                        return lastPlayedCards.some((lastPlayedCard) => handCardId!==lastPlayedCard);
+                    });
+
+                    player = {...player, hand};
+
+                } else {
+                    const hand = entities.columns['hand'].cardIds;
+
+                    player = {...player, hand};
+                }
 
                 const newData = {
                     ...data,
@@ -117,7 +131,7 @@ const InGame = ({socket, data, setData}) => {
                 socket.off('nextRoundStart');
             }
         }
-    }, [socket])
+    }, [socket, entities])
 
     useEffect(() => {
         window.addEventListener('click', onWindowClick);
