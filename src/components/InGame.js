@@ -6,7 +6,7 @@ import { multiDragAwareReorder, multiSelectTo as multiSelect } from '../util';
 import { isLegalMove } from "../util";
 import Column from "./Column";
 import Button from "./Button";
-import OtherPlayersUI from "./OtherPlayersUI";
+import PlayersUI from "./PlayersUI";
 import LastPlayedCards from "./LastPlayedCards";
 
 const hand = {
@@ -58,17 +58,14 @@ const InGame = ({socket, data, setData}) => {
 
     useEffect(() => {
         if(socket){
-            console.log('have socket in game');
             socket.on('nextTurnStart',({message, game, roomId, lastPlayedCards, lastTurnPlayer}) => {
                 console.log('next turn start');
-                console.log(message,game,roomId,lastPlayedCards,lastTurnPlayer);
-                console.log(entities);
 
                 let player = game.players.find((player) => player.id === data.player.id);
-
+                console.log(entities);
                 if (player.id === lastTurnPlayer.id) {
                     const hand = entities.columns['hand'].cardIds.filter((handCardId) => {
-                        return lastPlayedCards.some((lastPlayedCard) => handCardId!==lastPlayedCard);
+                        return lastPlayedCards.length===0 || lastPlayedCards.some((lastPlayedCard) => handCardId!==lastPlayedCard);
                     });
 
                     player = {...player, hand};
@@ -125,7 +122,6 @@ const InGame = ({socket, data, setData}) => {
         }
         return ()=>{
             if(socket){
-                console.log('socket off');
                 socket.off('nextTurnStart');
                 socket.off('roundEnd');
                 socket.off('nextRoundStart');
@@ -316,23 +312,25 @@ const InGame = ({socket, data, setData}) => {
     const onClickPassTurn = () => {
         if(!data.player.isTurn)return;
 
-        socket.emit('playerPlayCards',{
-            roomId: data.game.roomId,
-            player: data.player,
-            cards: [],
-        });        
-
+        console.log(entities);
+        
         setEntities({...entities, 
             columns: 
             {"deck": {...entities.columns["deck"], cardIds: []}, 
             "hand": {...entities.columns["hand"], cardIds: [...entities.columns["hand"].cardIds, ...entities.columns["deck"].cardIds]}}
         })
+
+        socket.emit('playerPlayCards',{
+            roomId: data.game.roomId,
+            player: data.player,
+            cards: [],
+        }); 
         console.log("pass turn");
     }
 
     return (
         <>
-        {/* <OtherPlayersUI data={data}/> */}
+        <PlayersUI data={data}/>
         <LastPlayedCards data={data}/>
         <DragDropContext
         onDragStart={onDragStart}
