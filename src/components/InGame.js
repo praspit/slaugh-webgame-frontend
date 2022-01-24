@@ -1,34 +1,15 @@
 import { useState, useEffect } from "react"
 import styled from "styled-components";
 import {DragDropContext} from 'react-beautiful-dnd'
-import { multiDragAwareReorder, multiSelectTo as multiSelect } from '../util';
+import { initial, multiDragAwareReorder, multiSelectTo as multiSelect } from '../util';
 
 import { isLegalMove } from "../util";
 import Column from "./Column";
 import Button from "./Button";
 import PlayersUI from "./PlayersUI";
 import LastPlayedCards from "./LastPlayedCards";
-
-const hand = {
-    id:'hand',
-    title: 'Card In Hand',
-    cardIds: []
-}
-
-const deck = {
-    id:'deck',
-    title: 'Place the card here',
-    cardIds: []
-}
-
-const initial = {
-    columnOrder: [deck.id, hand.id],
-    columns: {
-        [deck.id]: deck,
-        [hand.id]: hand
-    },
-    cards: []
-}
+import RoundEndPage from "./RoundEndPage";
+import ExchangeCardsPage from "./ExchangeCardsPage";
 
 const getCards = (entities, columnId) =>
     entities.columns[columnId].cardIds.map(
@@ -51,10 +32,12 @@ const Container = styled.div`
 `;
 
 
-const InGame = ({socket, data, setData}) => {
+const InGame = ({socket, data, setData, onClickStartGame}) => {
     const [entities, setEntities] = useState(initial);
     const [selectedCardIds, setSelectedCardIds] = useState([]);
     const [draggingCardId, setDraggingCardId] = useState(null);
+    const [roundEnd, setRoundEnd] = useState(false);
+    const [exchangeCardsState, setExchangeCardsState] = useState(false);
 
     useEffect(() => {
         if(socket){
@@ -71,7 +54,7 @@ const InGame = ({socket, data, setData}) => {
                     player = {...player, hand};
 
                 } else {
-                    const hand = entities.columns['hand'].cardIds;
+                    const hand = [...entities.columns['hand'].cardIds, ...entities.columns['deck'].cardIds];
 
                     player = {...player, hand};
                 }
@@ -102,6 +85,8 @@ const InGame = ({socket, data, setData}) => {
                 }
                 setData(newData);
                 sessionStorage.setItem('data', JSON.stringify(newData));
+
+                setRoundEnd(true);
             });
 
             socket.on('nextRoundStart',({message, game, roomId}) => {
@@ -118,6 +103,35 @@ const InGame = ({socket, data, setData}) => {
                 }
                 setData(newData);
                 sessionStorage.setItem('data', JSON.stringify(newData));
+
+                setExchangeCardsState(true);
+            })
+
+            socket.on('exchangeCards', ({message, game, playerExchanged, roomId}) => {
+                console.log('exchange card');
+                console.log({message, game, playerExchanged, roomId});
+
+
+            })
+
+            socket.on('exchangeComplete', ({message, game, roomId}) => {
+                console.log('exchange complete');
+                console.log({message, game, roomId});
+
+                const player = game.players.find((player) => player.id === data.player.id);
+
+                const newData = {
+                    ...data,
+                    message,
+                    game,
+                    roomId,
+                    player,
+                }
+                setData(newData);
+                sessionStorage.setItem('data', JSON.stringify(newData));
+
+                setExchangeCardsState(false);
+                setRoundEnd(false);
             })
         }
         return ()=>{
@@ -125,6 +139,8 @@ const InGame = ({socket, data, setData}) => {
                 socket.off('nextTurnStart');
                 socket.off('roundEnd');
                 socket.off('nextRoundStart');
+                socket.off('exchangeCards');
+                socket.off('exchangeComplete');
             }
         }
     }, [socket, entities])
@@ -330,33 +346,47 @@ const InGame = ({socket, data, setData}) => {
 
     return (
         <>
-        <PlayersUI data={data}/>
-        <LastPlayedCards data={data}/>
-        <DragDropContext
-        onDragStart={onDragStart}
-        onDragEnd={onDragEnd}>
-            <Container>
-                {entities.columnOrder.map((columnId) => (
-                    <Column
-                        column={entities.columns[columnId]}
-                        cards={getCards(entities, columnId)}
-                        selectedCardIds={selectedCardIds}
-                        key={columnId}
-                        draggingCardId={draggingCardId}
-                        toggleSelection={toggleSelection}
-                        toggleSelectionInGroup={toggleSelectionInGroup}
-                        multiSelectTo={multiSelectTo}
-                    />
-                ))}
-            </Container>
-        </DragDropContext>
         {
-            data.player.isTurn && 
-            <Button type="play-card" text="Play" onClick={onClickPlayCard}/>
+            !exchangeCardsState &&
+        <>
+            <PlayersUI data={data}/>
+            <LastPlayedCards data={data}/>
+            <DragDropContext
+            onDragStart={onDragStart}
+            onDragEnd={onDragEnd}>
+                <Container>
+                    {entities.columnOrder.map((columnId) => (
+                        <Column
+                            column={entities.columns[columnId]}
+                            cards={getCards(entities, columnId)}
+                            selectedCardIds={selectedCardIds}
+                            key={columnId}
+                            draggingCardId={draggingCardId}
+                            toggleSelection={toggleSelection}
+                            toggleSelectionInGroup={toggleSelectionInGroup}
+                            multiSelectTo={multiSelectTo}
+                        />
+                    ))}
+                </Container>
+            </DragDropContext>
+            {
+                data.player.isTurn && 
+                <Button type="play-card" text="Play" onClick={onClickPlayCard}/>
+            }
+            {
+                data.player.isTurn &&
+                <Button type="pass" text="Pass" onClick={onClickPassTurn}/>
+            }
+        </>
         }
         {
-            data.player.isTurn &&
-            <Button type="pass" text="Pass" onClick={onClickPassTurn}/>
+            roundEnd && !exchangeCardsState && 
+            <RoundEndPage data={data} onClickStartGame={onClickStartGame}/>
+        }
+
+        {
+            roundEnd && exchangeCardsState &&
+            <ExchangeCardsPage data={data} socket={socket}/>
         }
         </>
     )

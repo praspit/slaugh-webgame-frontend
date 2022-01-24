@@ -1,5 +1,47 @@
 import reorder from './reorder'
 
+const hand = {
+    id:'hand',
+    title: 'Card In Hand',
+    cardIds: []
+}
+
+const deck = {
+    id:'deck',
+    title: 'Place the card here',
+    cardIds: []
+}
+
+export const initial = {
+    columnOrder: [deck.id, hand.id],
+    columns: {
+        [deck.id]: deck,
+        [hand.id]: hand
+    },
+    cards: []
+}
+
+const keepCard = {
+    id:'keepCard',
+    title: 'Card In Hand',
+    cardIds: []
+}
+
+const sendCard = {
+    id:'sendCard',
+    title: 'Place the card that you want to exchange',
+    cardIds: []
+}
+
+export const initialExchangeCard = {
+    columnOrder: [sendCard.id, keepCard.id],
+    columns: {
+        [sendCard.id]: sendCard,
+        [keepCard.id]: keepCard
+    },
+    cards: []
+}
+
 const withNewCardIds = (column, cardIds) => ({
   id: column.id,
   title: column.title,

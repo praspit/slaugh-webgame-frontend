@@ -16,7 +16,6 @@ const Container = styled.div`
 
 const Title = styled.h3`
   font-weight: bold;
-  padding: ${grid}px;
   color: ${colors.white};
 `
 

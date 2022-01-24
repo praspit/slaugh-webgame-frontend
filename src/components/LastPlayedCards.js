@@ -17,11 +17,11 @@ const LastPlayedCards = ({data}) => {
             ?   lastPlayedCards.map((card) => {
                     return(
                     <Container key={card}>
-                        <img alt={card} style={{height: `${cardHeight}px`, width:`${cardWidth}px`}} src={require(`../images/cards/${card}.png`)}/>
+                        <img alt={card} style={{height: `${cardHeight * 1.7}px`, width:`${cardWidth * 1.7}px`}} src={require(`../images/cards/${card}.png`)}/>
                     </Container>)
                 })
             :   <Container>
-                    <img alt={"card-back"} style={{height: `${cardHeight}px`, width:`${cardWidth}px`}} src={require(`../images/cardBack.png`)}/>
+                    <img alt={"card-back"} style={{height: `${cardHeight * 1.7}px`, width:`${cardWidth * 1.7}px`}} src={require(`../images/cardBack.png`)}/>
                 </Container>
             }
         </div>

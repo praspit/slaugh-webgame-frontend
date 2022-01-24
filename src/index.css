@@ -28,7 +28,6 @@ body {
 .form {
   border: none;
   padding: 10px 20px;
-  margin: 5px;
 
   min-width: 400px;
   width: 30%;
@@ -55,7 +54,7 @@ body {
 }
 
 .btn-layout {
-  width: 50%;
+  width: min(50%, 300px);
   display: inline-block;
 }
 
@@ -88,6 +87,17 @@ body {
   margin: 15px 0px 5px 0px;
   height: auto;
   width: 200%;
+}
+
+.btn-layout-next-round {
+  width: 300px;
+  display: inline-block;
+}
+
+.btn-start-next-round {
+  width: 100%;
+  height: 60px;
+  margin-top: 40px;
 }
 
 .btn-play-card {
@@ -293,8 +303,37 @@ body {
 .last-played-cards {
   position: absolute;
   display: flex;
-  top: 10vh;
+  top: 2vh;
   left: calc(50vw - 100px);
+}
+
+.glass-pane {
+  backdrop-filter: blur(8px);
+
+  width: 100vw;
+  height: 100vh;
+  z-index: 10;
+
+  position: fixed;
+  top: 0;
+  left: 0;
+  margin: 0;
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+
+  color: white;
+}
+
+.glass-pane h2 {
+  margin-bottom: 50px;
+}
+
+.glass-pane h4 {
+  margin-top: 15px;
 }
 
 @media screen and (max-width: 600px) {
