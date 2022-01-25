@@ -10,8 +10,8 @@ const root_URL = config.node_env === "development" ? 'http://localhost:5000' : '
 const Lobby = ({data,setData}) => {
     const [socket,setSocket] = useState(null);
     const [inGame,setInGame] = useState(sessionStorage.getItem('inGame')=='true' || false);
-    const [round,setRound] = useState(1);
-    const [time,setTime] = useState(15);
+    const [time,setTime] = useState(30);
+    const [showAlert, setShowAlert] = useState(false);
 
     useEffect(() => {
         //initialize socket
@@ -71,11 +71,47 @@ const Lobby = ({data,setData}) => {
             setInGame(true);
         })
 
+        socket.on('playerLeft', ({message, game, playerId, roomId}) => {
+            console.log(message);
+
+            const player = game.players.find((player) => player.id === data.player.id);
+
+            setData({...data,  player: player, game : game});
+            sessionStorage.setItem('data', JSON.stringify({...data,  player: player, game : game}));
+        })
+
+        socket.on('playerDisconnected', ({message, game, playerId, roomId}) => {
+            console.log(message);
+
+            alert(message);
+
+            const player = game.players.find((player) => player.id === data.player.id);
+
+            setData({...data,  player: player, game : game});
+            sessionStorage.setItem('data', JSON.stringify({...data,  player: player, game : game}));
+        })
+
+        socket.on('changeHost', ({message, newHostId, players, roomId}) => {
+            console.log(message);
+
+            if(data.player.id === newHostId) {
+                alert('You are the new host!');
+            }
+
+            const player = players.find((player) => player.id === data.player.id);
+
+            setData({...data,  player: player, game : {...data.game, players: players}});
+            sessionStorage.setItem('data', JSON.stringify({...data,  player: player, game : {...data.game, players: players}}));
+        })
+
         return ()=>{
             socket.off('ready');
             socket.off('connectedToRoom');
             socket.off('newPlayerJoined');
             socket.off('gameStart');
+            socket.off('playerLeft');
+            socket.off('playerDisconnected');
+            socket.off('changeHost');
         }
 
     },[socket,data,setData])
@@ -85,10 +121,9 @@ const Lobby = ({data,setData}) => {
 
         socket.emit('hostStartGame',{
             roomId : data.game.roomId,
-            player : data.player
+            player : data.player,
+            timeLimit : time,
         })
-
-        console.log(`start game for ${round} rounds and time per turn is ${time} seconds`)
         
         setInGame(true);
     }
@@ -97,7 +132,7 @@ const Lobby = ({data,setData}) => {
         <div className='container'>
         {inGame
             ? <InGame socket={socket} data={data} setData={setData} onClickStartGame={onClickStartGame}/>
-            : <WaitingRoom  round={round} setRound={setRound} time={time} setTime={setTime} onClickStartGame={onClickStartGame} data={data} setData={setData}/>
+            : <WaitingRoom time={time} setTime={setTime} onClickStartGame={onClickStartGame} data={data} setData={setData}/>
         }
         </div>
     )

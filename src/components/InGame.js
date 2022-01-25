@@ -133,6 +133,18 @@ const InGame = ({socket, data, setData, onClickStartGame}) => {
                 setExchangeCardsState(false);
                 setRoundEnd(false);
             })
+
+            socket.on('startPlaying', ({message, roomId}) => {
+                console.log(message);
+
+                setData({...data, game: {...data.game, status:'playing'}});
+            })
+
+            socket.on('playerTimesUp', ({message, playerId}) => {
+                console.log(message);
+            })
+
+
         }
         return ()=>{
             if(socket){
@@ -141,6 +153,8 @@ const InGame = ({socket, data, setData, onClickStartGame}) => {
                 socket.off('nextRoundStart');
                 socket.off('exchangeCards');
                 socket.off('exchangeComplete');
+                socket.off('startPlaying');
+                socket.off('playerTimesUp');
             }
         }
     }, [socket, entities])

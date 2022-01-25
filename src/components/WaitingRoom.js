@@ -1,13 +1,7 @@
-import { useEffect } from 'react'
-import RoundSlider from './RoundSlider'
 import TimeSlider from './TimeSlider'
 import Button from './Button'
 
-const WaitingRoom = ({round,setRound,time,setTime,onClickStartGame,data,setData}) => {
-    const onRoundChange = (event)=>{
-        setRound(event.target.valueAsNumber);
-    }
-
+const WaitingRoom = ({time,setTime,onClickStartGame,data,setData}) => {
     const onTimeChange = (event)=>{
         setTime(event.target.valueAsNumber);
     }
@@ -25,7 +19,6 @@ const WaitingRoom = ({round,setRound,time,setTime,onClickStartGame,data,setData}
             {data.player.isHost 
                 ?
                     <div className='game-option'>
-                        <RoundSlider value={round} onTypeChange={onRoundChange}></RoundSlider>
                         <TimeSlider value={time} onTypeChange={onTimeChange}></TimeSlider>
                         <Button type='start' text='Start the game' onClick={onClickStartGame}></Button>
                     </div>
