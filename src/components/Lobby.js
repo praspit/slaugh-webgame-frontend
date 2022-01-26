@@ -9,9 +9,8 @@ const root_URL = config.node_env === "development" ? 'http://localhost:5000' : '
 
 const Lobby = ({data,setData}) => {
     const [socket,setSocket] = useState(null);
-    const [inGame,setInGame] = useState(sessionStorage.getItem('inGame')=='true' || false);
+    const [inGame,setInGame] = useState(sessionStorage.getItem('inGame')==='true' || false);
     const [time,setTime] = useState(30);
-    const [showAlert, setShowAlert] = useState(false);
 
     useEffect(() => {
         //initialize socket
@@ -71,19 +70,19 @@ const Lobby = ({data,setData}) => {
             setInGame(true);
         })
 
-        socket.on('playerLeft', ({message, game, playerId, roomId}) => {
-            console.log(message);
+        socket.on('playerLeft', ({message, playerName, players, roomId}) => {
+            console.log({message, playerName, players, roomId});
 
-            const player = game.players.find((player) => player.id === data.player.id);
+            const player = players.find((player) => player.id === data.player.id);
 
-            setData({...data,  player: player, game : game});
-            sessionStorage.setItem('data', JSON.stringify({...data,  player: player, game : game}));
+            setData({...data,  player: player, game : {...data.game, players: players}});
+            sessionStorage.setItem('data', JSON.stringify({...data,  player: player, game : {...data.game, players: players}}));
         })
 
         socket.on('playerDisconnected', ({message, game, playerId, roomId}) => {
             console.log(message);
 
-            alert(message);
+            // alert(message);
 
             const player = game.players.find((player) => player.id === data.player.id);
 
@@ -92,11 +91,11 @@ const Lobby = ({data,setData}) => {
         })
 
         socket.on('changeHost', ({message, newHostId, players, roomId}) => {
-            console.log(message);
+            console.log({message, newHostId, players, roomId});
 
-            if(data.player.id === newHostId) {
-                alert('You are the new host!');
-            }
+            // if(data.player.id === newHostId) {
+            //     alert('You are the new host!');
+            // }
 
             const player = players.find((player) => player.id === data.player.id);
 
@@ -132,7 +131,7 @@ const Lobby = ({data,setData}) => {
         <div className='container'>
         {inGame
             ? <InGame socket={socket} data={data} setData={setData} onClickStartGame={onClickStartGame}/>
-            : <WaitingRoom time={time} setTime={setTime} onClickStartGame={onClickStartGame} data={data} setData={setData}/>
+            : <WaitingRoom socket={socket} time={time} setTime={setTime} data={data} setData={setData} setInGame={setInGame}/>
         }
         </div>
     )
