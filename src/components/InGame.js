@@ -16,22 +16,6 @@ const getCards = (entities, columnId) =>
     (cardId) => entities.cards[cardId]
 );
 
-const Container = styled.div`
-  display: flex;
-  user-select: none;
-  padding: 10px;
-  flex-direction: column;
-  position: absolute;
-  bottom: 0px;
-  margin-left: auto;
-  margin-right: auto;
-  left: 0px;
-  right: 0px;
-  text-align: center;
-  width: min(70vw,700px);
-`;
-
-
 const InGame = ({socket, data, setData, onClickStartGame}) => {
     const [entities, setEntities] = useState(initial);
     const [selectedCardIds, setSelectedCardIds] = useState([]);
@@ -368,7 +352,7 @@ const InGame = ({socket, data, setData, onClickStartGame}) => {
             <DragDropContext
             onDragStart={onDragStart}
             onDragEnd={onDragEnd}>
-                <Container>
+                <div className="column-container">
                     {entities.columnOrder.map((columnId) => (
                         <Column
                             column={entities.columns[columnId]}
@@ -381,7 +365,7 @@ const InGame = ({socket, data, setData, onClickStartGame}) => {
                             multiSelectTo={multiSelectTo}
                         />
                     ))}
-                </Container>
+                </div>
             </DragDropContext>
             {
                 data.player.isTurn && 

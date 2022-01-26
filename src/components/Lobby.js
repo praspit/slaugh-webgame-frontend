@@ -93,10 +93,6 @@ const Lobby = ({data,setData}) => {
         socket.on('changeHost', ({message, newHostId, players, roomId}) => {
             console.log({message, newHostId, players, roomId});
 
-            // if(data.player.id === newHostId) {
-            //     alert('You are the new host!');
-            // }
-
             const player = players.find((player) => player.id === data.player.id);
 
             setData({...data,  player: player, game : {...data.game, players: players}});

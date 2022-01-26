@@ -340,6 +340,21 @@ span {
   margin-top: 15px;
 }
 
+.column-container {
+  display: flex;
+  user-select: none;
+  padding: 10px;
+  flex-direction: column;
+  position: absolute;
+  bottom: 0px;
+  margin-left: auto;
+  margin-right: auto;
+  left: 0px;
+  right: 0px;
+  text-align: center;
+  width: min(70vw, 700px);
+}
+
 @media screen and (max-width: 600px) {
   .btn-play-card {
     right: 0px;
