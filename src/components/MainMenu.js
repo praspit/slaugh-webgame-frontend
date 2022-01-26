@@ -30,21 +30,14 @@ const MainMenu = ({socket,data,setData}) => {
                 try{
                     const res = await axios.post(root_URL + "/api/rooms/join/" + roomId, {name:userName});
 
-                    setRoomIdError('');
-                    setData(res.data);
-                    localStorage.setItem('data', JSON.stringify(res.data));
-                    navigate("../Lobby/"+ roomId);
-
-                    // if(res.get('Room-Availability') === 'available') {
-                    //     setRoomIdError('');
-                    //     setData(res.data);
-                    //     localStorage.setItem('data', JSON.stringify(res.data));
-                    //     navigate("../Lobby/"+ roomId);
-                    // } else if(res.get('Room-Availability') === 'full') {
-                    //     setRoomIdError('this room is currently full!');
-                    //     setData(res.data);
-                    //     localStorage.setItem('data', JSON.stringify(res.data));
-                    // }
+                    if (res.headers['room-availability'] === 'available') {
+                        setRoomIdError('');
+                        setData(res.data);
+                        localStorage.setItem('data', JSON.stringify(res.data));
+                        navigate("../Lobby/"+ roomId);
+                    } else if (res.headers['room-availability'] === 'full') {
+                        setRoomIdError('this room is currently full!');
+                    }
                 } catch(err){
                     //the room doesn't exist
                     console.log(err);
