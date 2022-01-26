@@ -61,6 +61,12 @@ const MainMenu = ({socket,data,setData}) => {
     }
     //host create room
     const onClickHost = async () =>{
+        //no username
+        if(!userName) {
+            setUserNameError('Please Enter a Username!')
+            return;
+        }
+
         console.log('host create room')
         try {
             const res = await axios.post(root_URL + "/api/rooms/hostnew", {name:userName});
@@ -84,7 +90,7 @@ const MainMenu = ({socket,data,setData}) => {
         <div className="container">
         <div className='form'>
             <h1 className="logo">Slaught.io</h1>
-            <span style={{color:"red"}}>{userNameError}</span>
+            <span>{userNameError}</span>
             {!showRoomId &&
                 <input 
                 type="text" 
@@ -94,7 +100,7 @@ const MainMenu = ({socket,data,setData}) => {
                 onChange={(e)=>setUserName(e.target.value)}
                 />
             }
-            <span style={{color:"red"}}>{roomIdError}</span>
+            <span>{roomIdError}</span>
             {showRoomId &&
                 <input 
                 type="text" 
