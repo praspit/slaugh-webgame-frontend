@@ -11,6 +11,8 @@ const Lobby = ({data,setData}) => {
     const [socket,setSocket] = useState(null);
     const [inGame,setInGame] = useState(sessionStorage.getItem('inGame')==='true' || false);
     const [time,setTime] = useState(30);
+    const [showClock, setShowClock] = useState(false);
+    const [timeLimit, setTimeLimit] = useState(20);
 
     useEffect(() => {
         //initialize socket
@@ -62,18 +64,20 @@ const Lobby = ({data,setData}) => {
         socket.on('gameStart', ({message,game,roomId})=>{
             console.log(message);
 
-            const player = game.players.find((player) => player.id === data.player.id);
+            const player = game.players.find((player) => player.uid === data.player.uid);
             
             setData({...data,  player: player, game : game});
             sessionStorage.setItem('data', JSON.stringify({...data,  player: player, game : game}));
             sessionStorage.setItem('inGame', 'true');
             setInGame(true);
+            setShowClock(true);
+            setTimeLimit(20);
         })
 
         socket.on('playerLeft', ({message, playerName, players, roomId}) => {
             console.log({message, playerName, players, roomId});
 
-            const player = players.find((player) => player.id === data.player.id);
+            const player = players.find((player) => player.uid === data.player.uid);
 
             setData({...data,  player: player, game : {...data.game, players: players}});
             sessionStorage.setItem('data', JSON.stringify({...data,  player: player, game : {...data.game, players: players}}));
@@ -84,7 +88,7 @@ const Lobby = ({data,setData}) => {
 
             // alert(message);
 
-            const player = game.players.find((player) => player.id === data.player.id);
+            const player = game.players.find((player) => player.uid === data.player.uid);
 
             setData({...data,  player: player, game : game});
             sessionStorage.setItem('data', JSON.stringify({...data,  player: player, game : game}));
@@ -93,7 +97,7 @@ const Lobby = ({data,setData}) => {
         socket.on('changeHost', ({message, newHostId, players, roomId}) => {
             console.log({message, newHostId, players, roomId});
 
-            const player = players.find((player) => player.id === data.player.id);
+            const player = players.find((player) => player.uid === data.player.uid);
 
             setData({...data,  player: player, game : {...data.game, players: players}});
             sessionStorage.setItem('data', JSON.stringify({...data,  player: player, game : {...data.game, players: players}}));
@@ -126,7 +130,7 @@ const Lobby = ({data,setData}) => {
     return (
         <div className='container'>
         {inGame
-            ? <InGame socket={socket} data={data} setData={setData} onClickStartGame={onClickStartGame}/>
+            ? <InGame socket={socket} data={data} setData={setData} onClickStartGame={onClickStartGame} showClock={showClock} setShowClock={setShowClock} timeLimit={timeLimit} setTimeLimit={setTimeLimit}/>
             : <WaitingRoom socket={socket} time={time} setTime={setTime} data={data} setData={setData} setInGame={setInGame}/>
         }
         </div>

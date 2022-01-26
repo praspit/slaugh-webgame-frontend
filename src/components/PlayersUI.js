@@ -11,7 +11,7 @@ const PlayersUI = ({data}) => {
     return (
         <div className="players-in-game">
             {players && players.map((player) => {
-                return <PlayerUI key={player.id} player={player} data={data}/>;
+                return <PlayerUI key={player.uid} player={player} data={data}/>;
             })
             }
         </div>

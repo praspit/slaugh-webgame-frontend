@@ -355,6 +355,29 @@ span {
   width: min(70vw, 700px);
 }
 
+.timer-container {
+  position: absolute;
+  margin-top: 10px;
+  margin-left: 10px;
+}
+
+.timer-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.timer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.title {
+  position: absolute;
+  top: 10px;
+  color: white;
+}
+
 @media screen and (max-width: 600px) {
   .btn-play-card {
     right: 0px;

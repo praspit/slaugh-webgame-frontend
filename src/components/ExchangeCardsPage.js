@@ -11,27 +11,11 @@ const getCards = (entities, columnId) =>
     (cardId) => entities.cards[cardId]
 );
 
-const Container = styled.div`
-  display: flex;
-  user-select: none;
-  padding: 10px;
-  flex-direction: column;
-  position: absolute;
-  bottom: 0px;
-  margin-left: auto;
-  margin-right: auto;
-  left: 0px;
-  right: 0px;
-  text-align: center;
-  width: min(70vw,700px);
-`;
-
 const ExchangeCardsPage = ({data, socket}) => {
     const [exchangeCardsEntities, setExchangeCardsEntities] = useState(initialExchangeCard);
     const [selectedCardIds, setSelectedCardIds] = useState([]);
     const [draggingCardId, setDraggingCardId] = useState(null);
-
-
+    const [exchangeComplete, setExchangeComplete] =useState(false);
 
     useEffect(() => {
         const cards = data.player.hand.map((val)=>{
@@ -216,6 +200,9 @@ const ExchangeCardsPage = ({data, socket}) => {
             player: data.player,
             cards: exchangeCardsEntities.columns['sendCard'].cardIds,
         })
+
+        setExchangeCardsEntities({...exchangeCardsEntities, columns: {...exchangeCardsEntities.columns, 'sendCard': {...exchangeCardsEntities.columns['sendCard'], cardIds:[]}}});
+        setExchangeComplete(true);
     }
 
     const isKing = () => {
@@ -230,12 +217,12 @@ const ExchangeCardsPage = ({data, socket}) => {
 
     return (
         <>
+            <div className="title"><h1>Exchange Cards Phase!</h1></div>
             <div className="glass-pane">
-                <h2>Exchange Cards Phase!</h2>
                 <DragDropContext
                 onDragStart={onDragStart}
                 onDragEnd={onDragEnd}>
-                    <Container>
+                    <div className="column-container">
                         {exchangeCardsEntities.columnOrder.map((columnId) => (
                             <Column
                                 column={exchangeCardsEntities.columns[columnId]}
@@ -248,10 +235,10 @@ const ExchangeCardsPage = ({data, socket}) => {
                                 multiSelectTo={multiSelectTo}
                             />
                         ))}
-                    </Container>
+                    </div>
                 </DragDropContext>
                 {
-                (isKing() || isQueen()) && 
+                (isKing() || isQueen()) && !exchangeComplete &&
                 <Button type="play-card" text="Exchange" onClick={onClickExchangeCards}/>
                 }
             </div>

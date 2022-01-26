@@ -10,26 +10,27 @@ import PlayersUI from "./PlayersUI";
 import LastPlayedCards from "./LastPlayedCards";
 import RoundEndPage from "./RoundEndPage";
 import ExchangeCardsPage from "./ExchangeCardsPage";
+import Clock from "./Clock";
 
 const getCards = (entities, columnId) =>
     entities.columns[columnId].cardIds.map(
     (cardId) => entities.cards[cardId]
 );
 
-const InGame = ({socket, data, setData, onClickStartGame}) => {
+const InGame = ({socket, data, setData, onClickStartGame, showClock, setShowClock, timeLimit, setTimeLimit}) => {
     const [entities, setEntities] = useState(initial);
     const [selectedCardIds, setSelectedCardIds] = useState([]);
     const [draggingCardId, setDraggingCardId] = useState(null);
     const [roundEnd, setRoundEnd] = useState(false);
     const [exchangeCardsState, setExchangeCardsState] = useState(false);
+    const [clockKey, setClockKey] = useState(0);
 
     useEffect(() => {
         if(socket){
             socket.on('nextTurnStart',({message, game, roomId, lastPlayedCards, lastTurnPlayer}) => {
                 console.log('next turn start');
 
-                let player = game.players.find((player) => player.id === data.player.id);
-                console.log(entities);
+                let player = game.players.find((player) => player.uid === data.player.uid);
                 if (player.id === lastTurnPlayer.id) {
                     const hand = entities.columns['hand'].cardIds.filter((handCardId) => {
                         return lastPlayedCards.length===0 || lastPlayedCards.some((lastPlayedCard) => handCardId!==lastPlayedCard);
@@ -51,14 +52,17 @@ const InGame = ({socket, data, setData, onClickStartGame}) => {
                     player,
                 }
                 setData(newData);
-                
                 sessionStorage.setItem('data', JSON.stringify(newData));
+
+                // setShowClock(true);
+                // setTimeLimit(game.timeLimit);
+                setClockKey((prevKey)=>prevKey + 1)
             });
 
             socket.on('roundEnd', ({message, game, roomId}) => {
                 console.log('game end');
 
-                const player = game.players.find((player) => player.id === data.player.id);
+                const player = game.players.find((player) => player.uid === data.player.uid);
 
                 const newData = {
                     ...data,
@@ -70,13 +74,14 @@ const InGame = ({socket, data, setData, onClickStartGame}) => {
                 setData(newData);
                 sessionStorage.setItem('data', JSON.stringify(newData));
 
+                setShowClock(false);
                 setRoundEnd(true);
             });
 
             socket.on('nextRoundStart',({message, game, roomId}) => {
                 console.log({message, game, roomId});
                 
-                const player = game.players.find((player) => player.id === data.player.id);
+                const player = game.players.find((player) => player.uid === data.player.uid);
 
                 const newData = {
                     ...data,
@@ -88,6 +93,7 @@ const InGame = ({socket, data, setData, onClickStartGame}) => {
                 setData(newData);
                 sessionStorage.setItem('data', JSON.stringify(newData));
 
+                setShowClock(false);
                 setExchangeCardsState(true);
             })
 
@@ -95,14 +101,14 @@ const InGame = ({socket, data, setData, onClickStartGame}) => {
                 console.log('exchange card');
                 console.log({message, game, playerExchanged, roomId});
 
-
+                setShowClock(false);
             })
 
             socket.on('exchangeComplete', ({message, game, roomId}) => {
                 console.log('exchange complete');
                 console.log({message, game, roomId});
 
-                const player = game.players.find((player) => player.id === data.player.id);
+                const player = game.players.find((player) => player.uid === data.player.uid);
 
                 const newData = {
                     ...data,
@@ -113,6 +119,10 @@ const InGame = ({socket, data, setData, onClickStartGame}) => {
                 }
                 setData(newData);
                 sessionStorage.setItem('data', JSON.stringify(newData));
+                
+                setShowClock(true);
+                setTimeLimit(20);
+                setClockKey((prevKey)=>prevKey + 1);
 
                 setExchangeCardsState(false);
                 setRoundEnd(false);
@@ -122,10 +132,18 @@ const InGame = ({socket, data, setData, onClickStartGame}) => {
                 console.log(message);
 
                 setData({...data, game: {...data.game, status:'playing'}});
+
+                setShowClock(true);
+                setTimeLimit(data.game.timeLimit);
+                setClockKey((prevKey)=>prevKey + 1)
             })
 
             socket.on('playerTimesUp', ({message, playerId}) => {
                 console.log(message);
+
+                // setShowClock(true);
+                // setTimeLimit(data.game.timeLimit);
+                setClockKey((prevKey)=>prevKey + 1)
             })
 
 
@@ -345,6 +363,20 @@ const InGame = ({socket, data, setData, onClickStartGame}) => {
     return (
         <>
         {
+            showClock &&
+            <div className="timer-container">
+            <Clock clockKey={clockKey} timeLimit={timeLimit}/>
+            </div>
+        }
+        {
+            data.game.status === 'preparing' &&
+            <div className="title"><h1>Prepare your cards!</h1></div>
+        }
+        {
+            data.player.isTurn && data.game.status !== 'preparing' &&
+            <div className="title"><h1>Your Turn!</h1></div>
+        }
+        {
             !exchangeCardsState &&
         <>
             <PlayersUI data={data}/>
@@ -368,11 +400,11 @@ const InGame = ({socket, data, setData, onClickStartGame}) => {
                 </div>
             </DragDropContext>
             {
-                data.player.isTurn && 
+                data.player.isTurn && data.game.status !== 'preparing' &&
                 <Button type="play-card" text="Play" onClick={onClickPlayCard}/>
             }
             {
-                data.player.isTurn &&
+                data.player.isTurn && data.game.status !== 'preparing' &&
                 <Button type="pass" text="Pass" onClick={onClickPassTurn}/>
             }
         </>

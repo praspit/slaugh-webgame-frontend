@@ -32,7 +32,7 @@ const WaitingRoom = ({socket, time, setTime, data, setData, setInGame}) => {
                 <h2>Room : {data.game.roomId}</h2>
                 <ul>
                     {data.game.players.map((player)=>{
-                        return <li key={player.id}>{player.name}</li>
+                        return <li key={player.uid}>{player.name}</li>
                     })}
                 </ul>
             </div>
