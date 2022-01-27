@@ -32,6 +32,7 @@ const RoundEndPage = ({data, onClickStartGame, socket}) => {
     const onClickBack = () => {
         if(!socket) return;
 
+        console.log('host go back to lobby');
         socket.emit('hostGoBackToLobby', {
             message: 'host go back to lobby',
             roomId: data.roomId,

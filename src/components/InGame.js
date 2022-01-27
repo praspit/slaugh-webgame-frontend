@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import {DragDropContext} from 'react-beautiful-dnd'
 import { initial, multiDragAwareReorder, multiSelectTo as multiSelect } from '../util';
 
@@ -126,8 +126,12 @@ const InGame = ({socket, data, setData, onClickStartGame, showClock, setShowCloc
             socket.on('startPlaying', ({message, roomId}) => {
                 console.log(message);
 
-                const newData = {...data, game: {...data.game, status:'playing'}};
+                let player = data.game.players.find((player) => player.uid === data.player.uid);
+                const hand = [...entities.columns['hand'].cardIds, ...entities.columns['deck'].cardIds];
+                player = {...player, hand};
 
+                const newData = {...data, player, game: {...data.game, status:'playing'}};
+                
                 setData(newData);
                 sessionStorage.setItem('data', JSON.stringify(newData));
 
@@ -149,7 +153,6 @@ const InGame = ({socket, data, setData, onClickStartGame, showClock, setShowCloc
 
                 setData({...data, game, player});
             })
-
         }
         return ()=>{
             if(socket){
@@ -166,15 +169,17 @@ const InGame = ({socket, data, setData, onClickStartGame, showClock, setShowCloc
     }, [socket, entities]);
 
     useEffect(() => {
-        const clockInterval = setInterval(() => {
-            setTimeLimit((prevTime) => {
-                if (prevTime <= 0) return 0;
-                return prevTime - 1;
-            });
-        }, 1000)
+        const clockInterval = setInterval(() => tick(), 1000);
 
         return () => clearInterval(clockInterval);
     }, []);
+
+    const tick = () => {
+        console.log('tick');
+        if(timeLimit <= 0) return;
+
+        setTimeLimit((prevTime) => prevTime - 1);
+    };
 
     useEffect(() => {
         window.addEventListener('click', onWindowClick);
@@ -435,7 +440,7 @@ const InGame = ({socket, data, setData, onClickStartGame, showClock, setShowCloc
         }
         {
             roundEnd && !exchangeCardsState && 
-            <RoundEndPage data={data} onClickStartGame={onClickStartGame}/>
+            <RoundEndPage data={data} onClickStartGame={onClickStartGame} socket={socket}/>
         }
 
         {
