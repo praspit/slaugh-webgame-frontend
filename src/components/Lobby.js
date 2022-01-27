@@ -129,9 +129,9 @@ const Lobby = ({data,setData}) => {
     
     return (
         <div className='container'>
-        {inGame
-            ? <InGame socket={socket} data={data} setData={setData} onClickStartGame={onClickStartGame} showClock={showClock} setShowClock={setShowClock} timeLimit={timeLimit} setTimeLimit={setTimeLimit}/>
-            : <WaitingRoom socket={socket} time={time} setTime={setTime} data={data} setData={setData} setInGame={setInGame}/>
+        {data.game.status === 'waiting'
+            ? <WaitingRoom socket={socket} time={time} setTime={setTime} data={data} setData={setData} setInGame={setInGame}/>
+            : <InGame socket={socket} data={data} setData={setData} onClickStartGame={onClickStartGame} showClock={showClock} setShowClock={setShowClock} timeLimit={timeLimit} setTimeLimit={setTimeLimit}/>
         }
         </div>
     )

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Button from "./Button";
 
-const RoundEndPage = ({data, onClickStartGame}) => {
+const RoundEndPage = ({data, onClickStartGame, socket}) => {
     const [text, setText] = useState('');
 
     useEffect(() => {
@@ -29,6 +29,15 @@ const RoundEndPage = ({data, onClickStartGame}) => {
 
     }, [data])
 
+    const onClickBack = () => {
+        if(!socket) return;
+
+        socket.emit('hostGoBackToLobby', {
+            message: 'host go back to lobby',
+            roomId: data.roomId,
+        })
+    }
+
         
     return (
         <>
@@ -37,7 +46,11 @@ const RoundEndPage = ({data, onClickStartGame}) => {
             <h3>{text}</h3>
             {
                 data.player.isHost 
-                ? <Button type="start-next-round" text="click to start next round" onClick={onClickStartGame}/>
+                ? 
+                <div className= 'btn-layout-next-round'>
+                    <Button type='left' text='Start next round' onClick={onClickStartGame}></Button>
+                    <Button type='right' text='Back' onClick={onClickBack}></Button>
+                </div>
                 : <h4>waiting for host to start next round . .</h4>
             }
         </div>

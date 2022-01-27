@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react"
-import styled from "styled-components";
 import {DragDropContext} from 'react-beautiful-dnd'
 import { initial, multiDragAwareReorder, multiSelectTo as multiSelect } from '../util';
 
@@ -10,7 +9,6 @@ import PlayersUI from "./PlayersUI";
 import LastPlayedCards from "./LastPlayedCards";
 import RoundEndPage from "./RoundEndPage";
 import ExchangeCardsPage from "./ExchangeCardsPage";
-import Clock from "./Clock";
 
 const getCards = (entities, columnId) =>
     entities.columns[columnId].cardIds.map(
@@ -23,7 +21,6 @@ const InGame = ({socket, data, setData, onClickStartGame, showClock, setShowCloc
     const [draggingCardId, setDraggingCardId] = useState(null);
     const [roundEnd, setRoundEnd] = useState(false);
     const [exchangeCardsState, setExchangeCardsState] = useState(false);
-    const [clockKey, setClockKey] = useState(0);
 
     useEffect(() => {
         if(socket){
@@ -54,9 +51,8 @@ const InGame = ({socket, data, setData, onClickStartGame, showClock, setShowCloc
                 setData(newData);
                 sessionStorage.setItem('data', JSON.stringify(newData));
 
-                // setShowClock(true);
-                // setTimeLimit(game.timeLimit);
-                setClockKey((prevKey)=>prevKey + 1)
+                setShowClock(true);
+                setTimeLimit(game.timeLimit);
             });
 
             socket.on('roundEnd', ({message, game, roomId}) => {
@@ -122,7 +118,6 @@ const InGame = ({socket, data, setData, onClickStartGame, showClock, setShowCloc
                 
                 setShowClock(true);
                 setTimeLimit(20);
-                setClockKey((prevKey)=>prevKey + 1);
 
                 setExchangeCardsState(false);
                 setRoundEnd(false);
@@ -131,21 +126,29 @@ const InGame = ({socket, data, setData, onClickStartGame, showClock, setShowCloc
             socket.on('startPlaying', ({message, roomId}) => {
                 console.log(message);
 
-                setData({...data, game: {...data.game, status:'playing'}});
+                const newData = {...data, game: {...data.game, status:'playing'}};
+
+                setData(newData);
+                sessionStorage.setItem('data', JSON.stringify(newData));
 
                 setShowClock(true);
                 setTimeLimit(data.game.timeLimit);
-                setClockKey((prevKey)=>prevKey + 1)
             })
 
             socket.on('playerTimesUp', ({message, playerId}) => {
                 console.log(message);
 
-                // setShowClock(true);
-                // setTimeLimit(data.game.timeLimit);
-                setClockKey((prevKey)=>prevKey + 1)
+                setShowClock(true);
+                setTimeLimit(data.game.timeLimit);
             })
 
+            socket.on('backToLobby', ({message, game, roomId}) => {
+                console.log(message);
+
+                const player = game.players.find((player) => player.uid === data.player.uid);
+
+                setData({...data, game, player});
+            })
 
         }
         return ()=>{
@@ -157,9 +160,21 @@ const InGame = ({socket, data, setData, onClickStartGame, showClock, setShowCloc
                 socket.off('exchangeComplete');
                 socket.off('startPlaying');
                 socket.off('playerTimesUp');
+                socket.off('backToLobby');
             }
         }
-    }, [socket, entities])
+    }, [socket, entities]);
+
+    useEffect(() => {
+        const clockInterval = setInterval(() => {
+            setTimeLimit((prevTime) => {
+                if (prevTime <= 0) return 0;
+                return prevTime - 1;
+            });
+        }, 1000)
+
+        return () => clearInterval(clockInterval);
+    }, []);
 
     useEffect(() => {
         window.addEventListener('click', onWindowClick);
@@ -365,7 +380,16 @@ const InGame = ({socket, data, setData, onClickStartGame, showClock, setShowCloc
         {
             showClock &&
             <div className="timer-container">
-            <Clock clockKey={clockKey} timeLimit={timeLimit}/>
+                <div className="timer">
+                    {
+                        timeLimit > 0
+                        ?   <>
+                            <div style={{fontSize:'40px',color:'white'}}>{timeLimit}</div>
+                            <div style={{color:'#aaa'}}>seconds</div>
+                            </>
+                        :  <div style={{fontSize:'20px',color:'white'}}>Time's up!</div>
+                    }
+                </div>
             </div>
         }
         {

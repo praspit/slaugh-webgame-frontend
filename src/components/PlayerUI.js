@@ -4,6 +4,11 @@ const PlayerUI = ({player, data}) => {
     const [detail, setDetail] = useState("waiting");
 
     useEffect(() => {
+        if(player.connection === 'disconnected') {
+            setDetail('disconnected . .');
+            return;
+        }
+
         if(player.handSize===0) {
             setDetail("waiting for next round...");
             return;

@@ -58,7 +58,7 @@ span {
 }
 
 .btn-layout {
-  width: min(50%, 300px);
+  width: 50%;
   display: inline-block;
 }
 
@@ -94,8 +94,9 @@ span {
 }
 
 .btn-layout-next-round {
-  width: 300px;
+  width: clamp(301.5px, 50%, 450px);
   display: inline-block;
+  margin-top: 25px;
 }
 
 .btn-start-next-round {
@@ -307,7 +308,7 @@ span {
 .last-played-cards {
   position: absolute;
   display: flex;
-  top: 2vh;
+  top: 10vh;
   left: calc(50vw - 100px);
 }
 
@@ -370,12 +371,25 @@ span {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  border-image: linear-gradient(45deg, red, yellow);
+  border-image-slice: 1;
 }
 
 .title {
-  position: absolute;
-  top: 10px;
   color: white;
+  position: absolute;
+  top: 2vh;
+  margin-left: auto;
+  margin-right: auto;
+  left: 0px;
+  right: 0px;
+  text-align: center;
 }
 
 @media screen and (max-width: 600px) {
