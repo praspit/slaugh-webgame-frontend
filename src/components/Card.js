@@ -4,31 +4,6 @@ import { grid, colors, borderRadius, cardHeight, cardWidth } from '../constants'
 
 const primaryButton = 0;
 
-const getBackgroundColor = ({
-  isSelected,
-  isGhosting,
-}) => {
-  if (isGhosting) {
-    return colors.grey.light;
-  }
-
-  if (isSelected) {
-    return colors.blue.light;
-  }
-
-  return colors.grey.light;
-}
-
-const getColor = ({ isSelected, isGhosting }) => {
-  if (isGhosting) {
-    return 'darkgrey';
-  }
-  if (isSelected) {
-    return colors.blue.deep;
-  }
-  return colors.black;
-}
-
 const Container = styled.div`
   padding: ${grid}px;
   border-radius: ${borderRadius}px;

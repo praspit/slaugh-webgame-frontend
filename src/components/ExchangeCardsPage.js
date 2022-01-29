@@ -1,7 +1,6 @@
-import { useState, useEffect} from "react";
-import { DragDropContext, Droppable } from "react-beautiful-dnd";
+import { useState, useEffect, useCallback} from "react";
+import { DragDropContext} from "react-beautiful-dnd";
 import { initialExchangeCard, multiDragAwareReorder, multiSelectTo as multiSelect } from "../util";
-import styled from "styled-components";
 
 import Column from "./Column";
 import Button from "./Button";
@@ -16,6 +15,16 @@ const ExchangeCardsPage = ({data, socket}) => {
     const [selectedCardIds, setSelectedCardIds] = useState([]);
     const [draggingCardId, setDraggingCardId] = useState(null);
     const [exchangeComplete, setExchangeComplete] =useState(false);
+
+    const isKing = useCallback(() => {
+        const id = data.player.id;
+        return id === data.game.king;
+    }, [data])
+
+    const isQueen = useCallback(() => {
+        const id = data.player.id;
+        return id === data.game.queen;
+    }, [data])
 
     useEffect(() => {
         if(isKing() || isQueen() ){
@@ -82,7 +91,7 @@ const ExchangeCardsPage = ({data, socket}) => {
 
             setExchangeCardsEntities(entities);
         }
-    },[data])
+    },[data, isKing, isQueen])
 
     useEffect(() => {
         window.addEventListener('click', onWindowClick);
@@ -234,17 +243,7 @@ const ExchangeCardsPage = ({data, socket}) => {
         setExchangeCardsEntities({...exchangeCardsEntities, columns: {...exchangeCardsEntities.columns, 'sendCard': {...exchangeCardsEntities.columns['sendCard'], cardIds:[]}}});
         setExchangeComplete(true);
     }
-
-    const isKing = () => {
-        const id = data.player.id;
-        return id === data.game.king;
-    }
-
-    const isQueen = () => {
-        const id = data.player.id;
-        return id === data.game.queen;
-    }
-
+    
     return (
         <>
             <div className="title">

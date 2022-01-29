@@ -2,7 +2,7 @@ import { Droppable } from "react-beautiful-dnd"
 import memoizeOne from 'memoize-one'
 import styled from 'styled-components'
 import Card from "./Card"
-import {grid, colors, borderRadius, cardHeight} from '../constants'
+import {grid, colors, cardHeight} from '../constants'
 
 const Container = styled.div`
   margin: ${grid}px;

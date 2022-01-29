@@ -9,7 +9,6 @@ const root_URL = config.node_env === "development" ? 'http://localhost:5000' : '
 
 const Lobby = ({data,setData}) => {
     const [socket,setSocket] = useState(null);
-    const [inGame,setInGame] = useState(sessionStorage.getItem('inGame')==='true' || false);
     const [time,setTime] = useState(30);
     const [showClock, setShowClock] = useState(false);
     const [timeLimit, setTimeLimit] = useState(20);
@@ -69,7 +68,6 @@ const Lobby = ({data,setData}) => {
             setData({...data,  player: player, game : game});
             sessionStorage.setItem('data', JSON.stringify({...data,  player: player, game : game}));
             sessionStorage.setItem('inGame', 'true');
-            setInGame(true);
             setShowClock(true);
             setTimeLimit(20);
         })
@@ -123,14 +121,13 @@ const Lobby = ({data,setData}) => {
             player : data.player,
             timeLimit : time,
         })
-        
-        setInGame(true);
+
     }
     
     return (
         <div className='container'>
         {data.game.status === 'waiting'
-            ? <WaitingRoom socket={socket} time={time} setTime={setTime} data={data} setData={setData} setInGame={setInGame}/>
+            ? <WaitingRoom socket={socket} time={time} setTime={setTime} data={data} setData={setData} />
             : <InGame socket={socket} data={data} setData={setData} onClickStartGame={onClickStartGame} showClock={showClock} setShowClock={setShowClock} timeLimit={timeLimit} setTimeLimit={setTimeLimit}/>
         }
         </div>

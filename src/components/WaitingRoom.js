@@ -2,7 +2,7 @@ import TimeSlider from './TimeSlider'
 import Button from './Button'
 import { useState } from 'react'
 
-const WaitingRoom = ({socket, time, setTime, data, setData, setInGame}) => {
+const WaitingRoom = ({socket, time, setTime, data}) => {
     const [error, setError] = useState('');
 
     const onTimeChange = (event)=>{
@@ -23,7 +23,6 @@ const WaitingRoom = ({socket, time, setTime, data, setData, setInGame}) => {
         })
         
         setError('');
-        setInGame(true);
     }
 
     return (

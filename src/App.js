@@ -1,6 +1,6 @@
 import MainMenu from './components/MainMenu';
 import Lobby from './components/Lobby';
-import { useState, useEffect } from 'react';
+import { useState} from 'react';
 import {
   BrowserRouter as Router,
   Routes,
