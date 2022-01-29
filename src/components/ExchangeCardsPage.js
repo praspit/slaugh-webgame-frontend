@@ -18,40 +18,70 @@ const ExchangeCardsPage = ({data, socket}) => {
     const [exchangeComplete, setExchangeComplete] =useState(false);
 
     useEffect(() => {
-        const cards = data.player.hand.map((val)=>{
-            return (
-                {id: `${val}`,
-                content: `${val}`});
-        });
+        if(isKing() || isQueen() ){
+            const cards = data.player.hand.map((val)=>{
+                return (
+                    {id: `${val}`,
+                    content: `${val}`});
+            });
 
-        const cardMap = cards.reduce((previous,current)=>{
-            previous[current.id] = current
-            return previous
-        },
-        {})
-
-        const keepCard = {
-            id:'keepCard',
-            title: 'Card In Hand',
-            cardIds: cards.map(card => card.id)
-        }
-
-        const sendCard = {
-            id:'sendCard',
-            title: 'Place the card that you want to exchange',
-            cardIds: []
-        }
-
-        const entities = {
-            columnOrder: [sendCard.id, keepCard.id],
-            columns: {
-                [sendCard.id]: sendCard,
-                [keepCard.id]: keepCard
+            const cardMap = cards.reduce((previous,current)=>{
+                previous[current.id] = current
+                return previous
             },
-            cards: cardMap
-        }
+            {})
 
-        setExchangeCardsEntities(entities);
+            const keepCard = {
+                id:'keepCard',
+                title: 'Cards In Hand',
+                cardIds: cards.map(card => card.id)
+            }
+
+            const sendCard = {
+                id:'sendCard',
+                title: 'Place the card that you want to exchange',
+                cardIds: []
+            }
+
+            const entities = {
+                columnOrder: [sendCard.id, keepCard.id],
+                columns: {
+                    [sendCard.id]: sendCard,
+                    [keepCard.id]: keepCard
+                },
+                cards: cardMap
+            }
+
+            setExchangeCardsEntities(entities);
+        } else {
+            const cards = data.player.hand.map((val)=>{
+                return (
+                    {id: `${val}`,
+                    content: `${val}`});
+            });
+
+            const cardMap = cards.reduce((previous,current)=>{
+                previous[current.id] = current
+                return previous
+            },
+            {})
+
+            const keepCard = {
+                id:'keepCard',
+                title: 'This is your cards',
+                cardIds: cards.map(card => card.id)
+            }
+
+            const entities = {
+                columnOrder: [keepCard.id],
+                columns: {
+                    [keepCard.id]: keepCard
+                },
+                cards: cardMap
+            }
+
+            setExchangeCardsEntities(entities);
+        }
     },[data])
 
     useEffect(() => {
@@ -217,7 +247,12 @@ const ExchangeCardsPage = ({data, socket}) => {
 
     return (
         <>
-            <div className="title"><h1>Exchange Cards Phase!</h1></div>
+            <div className="title">
+                {(isKing() || isQueen()) 
+                    ? <h1>Exchange Cards Phase!</h1>
+                    : <h1>Waiting for king and queen to exchange cards..</h1>
+                }
+            </div>
             <div className="glass-pane">
                 <DragDropContext
                 onDragStart={onDragStart}
