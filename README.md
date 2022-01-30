@@ -22,3 +22,16 @@ When player click join game
 
 if player didn't enter a valid username or valid room id, game will alert the player.
 ![image](https://user-images.githubusercontent.com/71002659/151710241-d57cef61-d302-4db4-b927-d16a431154c1.png)
+
+## Lobby
+This is the waiting room for players with the same room id. Host can change the time limit for each turn and is the one to start the game ( only when 4 players are in the room). 
+
+## In Game
+### Preparing Stage
+Players will take a look at their cards and could change the order of the cards. Player can't play any card yet.
+
+### Playing Stage
+Player will take turn to either play the card or pass the turn. Player can only play card that has more value than the last played card. If time's up, current turn's player will automatically pass that turn. If everybody pass except the player who play the last card, the pile will reset and that player will be the first to play. 
+
+### Round End Stage
+When the round ends, players will be notify what status they get and host can either start the next round or go back to lobby to get new player to join the room ( if other players disconnect).
