@@ -8,12 +8,12 @@ import {
 } from "react-router-dom";
 
 function App() {
-  const [data,setData] = useState(JSON.parse(sessionStorage.getItem('data')) || null);
+  const [data,setData] = useState(null);
 
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<MainMenu data={data} setData={setData}/>} />
+        <Route path="/" element={<MainMenu setData={setData}/>} />
         <Route path="/Lobby/:roomId" element={<Lobby data={data} setData={setData}/>} />  
       </Routes>
     </Router>

@@ -1,4 +1,4 @@
-import { useState, useEffect} from "react"
+import { useState, useEffect, useCallback} from "react"
 import {DragDropContext} from 'react-beautiful-dnd'
 import { initial, multiDragAwareReorder, multiSelectTo as multiSelect } from '../util';
 
@@ -49,7 +49,6 @@ const InGame = ({socket, data, setData, onClickStartGame, showClock, setShowCloc
                     player,
                 }
                 setData(newData);
-                sessionStorage.setItem('data', JSON.stringify(newData));
 
                 setShowClock(true);
                 setTimeLimit(game.timeLimit);
@@ -68,7 +67,6 @@ const InGame = ({socket, data, setData, onClickStartGame, showClock, setShowCloc
                     player,
                 }
                 setData(newData);
-                sessionStorage.setItem('data', JSON.stringify(newData));
 
                 setShowClock(false);
                 setRoundEnd(true);
@@ -87,7 +85,6 @@ const InGame = ({socket, data, setData, onClickStartGame, showClock, setShowCloc
                     player,
                 }
                 setData(newData);
-                sessionStorage.setItem('data', JSON.stringify(newData));
 
                 setShowClock(false);
                 setExchangeCardsState(true);
@@ -114,7 +111,6 @@ const InGame = ({socket, data, setData, onClickStartGame, showClock, setShowCloc
                     player,
                 }
                 setData(newData);
-                sessionStorage.setItem('data', JSON.stringify(newData));
                 
                 setShowClock(true);
                 setTimeLimit(20);
@@ -133,7 +129,6 @@ const InGame = ({socket, data, setData, onClickStartGame, showClock, setShowCloc
                 const newData = {...data, player, game: {...data.game, status:'playing'}};
                 
                 setData(newData);
-                sessionStorage.setItem('data', JSON.stringify(newData));
 
                 setShowClock(true);
                 setTimeLimit(data.game.timeLimit);
@@ -141,6 +136,16 @@ const InGame = ({socket, data, setData, onClickStartGame, showClock, setShowCloc
 
             socket.on('playerTimesUp', ({message, playerId}) => {
                 console.log(message);
+
+                let player = data.player;
+
+                if (data.player.id === playerId) {
+                    const hand = [...entities.columns['hand'].cardIds, ...entities.columns['deck'].cardIds];
+
+                    player = {...player, hand};
+
+                    setData({...data, player});
+                }
 
                 setShowClock(true);
                 setTimeLimit(data.game.timeLimit);
@@ -168,18 +173,18 @@ const InGame = ({socket, data, setData, onClickStartGame, showClock, setShowCloc
         }
     }, [socket, entities]);
 
+    const tick = useCallback(() => {
+        setTimeLimit((prevTime) => {
+            if(prevTime <= 0) return 0;
+            return prevTime - 1;
+        });
+    }, [setTimeLimit]);
+
     useEffect(() => {
         const clockInterval = setInterval(() => tick(), 1000);
 
         return () => clearInterval(clockInterval);
-    }, []);
-
-    const tick = () => {
-        console.log('tick');
-        if(timeLimit <= 0) return;
-
-        setTimeLimit((prevTime) => prevTime - 1);
-    };
+    }, [tick]);
 
     useEffect(() => {
         window.addEventListener('click', onWindowClick);
@@ -363,8 +368,6 @@ const InGame = ({socket, data, setData, onClickStartGame, showClock, setShowCloc
 
     const onClickPassTurn = () => {
         if(!data.player.isTurn)return;
-
-        console.log(entities);
         
         setEntities({...entities, 
             columns: 
@@ -402,7 +405,7 @@ const InGame = ({socket, data, setData, onClickStartGame, showClock, setShowCloc
             <div className="title"><h1>Prepare your cards!</h1></div>
         }
         {
-            data.player.isTurn && data.game.status !== 'preparing' &&
+            data.player.isTurn && data.game.status === 'playing' &&
             <div className="title"><h1>Your Turn!</h1></div>
         }
         {

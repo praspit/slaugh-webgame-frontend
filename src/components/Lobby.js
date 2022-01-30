@@ -3,6 +3,7 @@ import { useState, useEffect} from 'react'
 import WaitingRoom from './WaitingRoom'
 import io from 'socket.io-client'
 import InGame from './InGame'
+import { Prompt } from 'react-router'
 import config from '../config/config.js'
 
 const root_URL = config.node_env === "development" ? 'http://localhost:5000' : ''
@@ -12,6 +13,25 @@ const Lobby = ({data,setData}) => {
     const [time,setTime] = useState(30);
     const [showClock, setShowClock] = useState(false);
     const [timeLimit, setTimeLimit] = useState(20);
+
+    useEffect(() => {
+        window.addEventListener('beforeunload', alertUser)
+        window.addEventListener('unload', handleEndConcert)
+        return () => {
+        window.removeEventListener('beforeunload', alertUser)
+        window.removeEventListener('unload', handleEndConcert)
+        handleEndConcert()
+        }
+    }, [])
+
+    const alertUser = e => {
+        e.preventDefault()
+        e.returnValue = ''
+    }
+
+    const handleEndConcert = () => {
+        setData(null);
+    }
 
     useEffect(() => {
         //initialize socket
@@ -45,7 +65,6 @@ const Lobby = ({data,setData}) => {
             console.log({message,roomId,game});
 
             setData({...data, game : game});
-            sessionStorage.setItem('data', JSON.stringify({...data, game: game}));
         })
 
         //get all players from server when new player join
@@ -54,9 +73,6 @@ const Lobby = ({data,setData}) => {
 
             setData({...data, game:
                 {...data.game, players: players}});
-                
-            sessionStorage.setItem('data', JSON.stringify({...data, game:
-                {...data.game, players: players}}));
         })  
 
         //start the game 
@@ -66,8 +82,7 @@ const Lobby = ({data,setData}) => {
             const player = game.players.find((player) => player.uid === data.player.uid);
             
             setData({...data,  player: player, game : game});
-            sessionStorage.setItem('data', JSON.stringify({...data,  player: player, game : game}));
-            sessionStorage.setItem('inGame', 'true');
+
             setShowClock(true);
             setTimeLimit(20);
         })
@@ -78,7 +93,6 @@ const Lobby = ({data,setData}) => {
             const player = players.find((player) => player.uid === data.player.uid);
 
             setData({...data,  player: player, game : {...data.game, players: players}});
-            sessionStorage.setItem('data', JSON.stringify({...data,  player: player, game : {...data.game, players: players}}));
         })
 
         socket.on('playerDisconnected', ({message, game, playerId, roomId}) => {
@@ -89,7 +103,6 @@ const Lobby = ({data,setData}) => {
             const player = game.players.find((player) => player.uid === data.player.uid);
 
             setData({...data,  player: player, game : game});
-            sessionStorage.setItem('data', JSON.stringify({...data,  player: player, game : game}));
         })
 
         socket.on('changeHost', ({message, newHostId, players, roomId}) => {
@@ -98,7 +111,6 @@ const Lobby = ({data,setData}) => {
             const player = players.find((player) => player.uid === data.player.uid);
 
             setData({...data,  player: player, game : {...data.game, players: players}});
-            sessionStorage.setItem('data', JSON.stringify({...data,  player: player, game : {...data.game, players: players}}));
         })
 
         return ()=>{
@@ -126,6 +138,10 @@ const Lobby = ({data,setData}) => {
     
     return (
         <div className='container'>
+        {/* <Prompt
+            message={() => 'Are you sure you want to leave this page?'}
+        /> */}
+
         {data.game.status === 'waiting'
             ? <WaitingRoom socket={socket} time={time} setTime={setTime} data={data} setData={setData} />
             : <InGame socket={socket} data={data} setData={setData} onClickStartGame={onClickStartGame} showClock={showClock} setShowClock={setShowClock} timeLimit={timeLimit} setTimeLimit={setTimeLimit}/>

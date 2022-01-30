@@ -6,7 +6,7 @@ import config from "../config/config.js";
 
 const root_URL = config.node_env === "development" ? 'http://localhost:5000' : '' 
 
-const MainMenu = ({socket,data,setData}) => {
+const MainMenu = ({setData}) => {
     const [userName,setUserName] = useState('')
     const [roomId,setRoomId] = useState('')
     const [showRoomId , setShowRoomId] = useState(false);
@@ -33,7 +33,7 @@ const MainMenu = ({socket,data,setData}) => {
                     if (res.headers['room-availability'] === 'available') {
                         setRoomIdError('');
                         setData(res.data);
-                        localStorage.setItem('data', JSON.stringify(res.data));
+
                         navigate("../Lobby/"+ roomId);
                     } else if (res.headers['room-availability'] === 'full') {
                         setRoomIdError('this room is currently full!');
@@ -72,7 +72,7 @@ const MainMenu = ({socket,data,setData}) => {
             const res = await axios.post(root_URL + "/api/rooms/hostnew", {name:userName});
             console.log(res);
             setData(res.data);
-            localStorage.setItem('data', JSON.stringify(res.data));
+
             navigate("../Lobby/"+ res.data.game.roomId);
         }catch (err){
             console.log(err);
@@ -118,6 +118,7 @@ const MainMenu = ({socket,data,setData}) => {
                 :   <Button type='right' text='Host new Game' onClick={onClickHost}></Button>
             }
         </div>
+        <div className="version-text">version 0.1 (beta)</div>
         </div>
     )
 }

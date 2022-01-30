@@ -48,7 +48,7 @@ const ExchangeCardsPage = ({data, socket}) => {
 
             const sendCard = {
                 id:'sendCard',
-                title: 'Place 2 cards that you want to exchange',
+                title: 'Place 2 cards that you want to exchange with slave',
                 cardIds: []
             }
 
@@ -71,7 +71,7 @@ const ExchangeCardsPage = ({data, socket}) => {
 
             const sendCard = {
                 id:'sendCard',
-                title: 'Place 1 card that you want to exchange',
+                title: 'Place 1 card that you want to exchange with high slave',
                 cardIds: []
             }
 
@@ -79,6 +79,38 @@ const ExchangeCardsPage = ({data, socket}) => {
                 columnOrder: [sendCard.id, keepCard.id],
                 columns: {
                     [sendCard.id]: sendCard,
+                    [keepCard.id]: keepCard
+                },
+                cards: cardMap
+            }
+
+            setExchangeCardsEntities(entities);
+        } else if (data.player.id === data.game.slave) {
+            const keepCard = {
+                id:'keepCard',
+                title: 'This is your initial cards. Waiting for king to exchange 2 cards with you.',
+                cardIds: cards.map(card => card.id)
+            }
+
+            const entities = {
+                columnOrder: [keepCard.id],
+                columns: {
+                    [keepCard.id]: keepCard
+                },
+                cards: cardMap
+            }
+
+            setExchangeCardsEntities(entities);
+        } else if (data.player.id === data.game.highSlave) {
+            const keepCard = {
+                id:'keepCard',
+                title: 'This is your initial cards. Waiting for queen to exchange 1 card with you.',
+                cardIds: cards.map(card => card.id)
+            }
+
+            const entities = {
+                columnOrder: [keepCard.id],
+                columns: {
                     [keepCard.id]: keepCard
                 },
                 cards: cardMap

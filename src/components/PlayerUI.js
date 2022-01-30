@@ -40,7 +40,7 @@ const PlayerUI = ({player, data}) => {
     return (
         <div className="player-ui">
             <div className="avatar">
-                {player.status }
+                <img alt={`${player.status}`} style={{height: "40px", width: "40px"}} src={require(`../images/status/${player.status}.png`)}/>
             </div>
             <div className="player-info">
                 <div className="player-heading">
