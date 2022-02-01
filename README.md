@@ -1,5 +1,5 @@
 ﻿# Slaugh-webgame-frontend
-This repository is for the Front-End of Slaugh Webgame (deploy soon ! ). 
+This repository is for the Front-End of **Slaugh Webgame** ( website: https://slaughgame.herokuapp.com/ ) this game is still **under development**!  
 
 ## What is Slaugh??
 This game is a card game that players will take turn to place the card on the deck and try to get rid of their cards as fast as possible. You can only place card that has more value than the card in the deck. The first player to win is the King. The second player to in win is the Queen. The last player is Slave and next to last is High slave. Then, at start of the next round, King will exchange 2 cards with slave and Queen will exchange 1 card with high slave (slave and high slave will always exchange the most valuable cards). Then the game goes on. Remember! Any player can become king, queen or slave by the end of the each turn! So try to win as fast as possible and 
