@@ -24,14 +24,21 @@ if player didn't enter a valid username or valid room id, game will alert the pl
 ![image](https://user-images.githubusercontent.com/71002659/151710241-d57cef61-d302-4db4-b927-d16a431154c1.png)
 
 ## Lobby
-This is the waiting room for players with the same room id. Host can change the time limit for each turn and is the one to start the game ( only when 4 players are in the room). 
+This is the waiting room for players with the same room id. Host can change the time limit for each turn and is the one to start the game ( only when 4 players are in the room).
+host can adjust time per player's turn. 
+![image](https://user-images.githubusercontent.com/71002659/151906682-02239a08-9604-4563-aeac-21a206c0136f.png)
+
 
 ## In Game
 ### Preparing Stage
 Players will take a look at their cards and could change the order of the cards. Player can't play any card yet.
+![image](https://user-images.githubusercontent.com/71002659/151906805-587857c8-7f7e-4e38-a83e-b0dc99a3954b.png)
+
 
 ### Playing Stage
-Player will take turn to either play the card or pass the turn. Player can only play card that has more value than the last played card. If time's up, current turn's player will automatically pass that turn. If everybody pass except the player who play the last card, the pile will reset and that player will be the first to play. 
+Player will take turn to either play the card or pass the turn. Player can only play card that has more value than the last played card. If time's up, current turn's player will automatically pass that turn. If everybody pass except the player who play the last card, the pile will reset and that player will be the first to play.
+![image](https://user-images.githubusercontent.com/71002659/151906839-ff078d64-934c-43ec-a79a-8edff02bf1b9.png)
+
 
 ### Round End Stage
 When the round ends, players will be notify what status they get and host can either start the next round or go back to lobby to get new player to join the room ( if other players disconnect).
